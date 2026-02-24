@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version:*)",
+      "Bash(npx expo --version)",
+      "Bash(npx expo install:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx expo export:*)",
+      "Bash(npm install:*)",
+      "Bash(npx expo start)"
+    ]
+  }
+}
