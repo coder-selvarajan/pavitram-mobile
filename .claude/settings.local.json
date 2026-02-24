@@ -8,7 +8,15 @@
       "Bash(npx tsc:*)",
       "Bash(npx expo export:*)",
       "Bash(npm install:*)",
-      "Bash(npx expo start)"
+      "Bash(npx expo start)",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/_layout.tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/index.tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/settings.tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/index.tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/statement.tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/pending.tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/bills/[billId].tsx\")",
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/payments/[paymentId].tsx\")"
     ]
   }
 }
