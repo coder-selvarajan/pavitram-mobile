@@ -1410,75 +1410,11 @@ Match the layout from the attached screenshot. Reference ../pavitram-web-app/src
 
 ---
 
-### Prompt 7: Vendor Statement Screen
-
-> Attach screenshots: `screenshots/04-vendor-statement-expanded.png` and `screenshots/05-vendor-statement-compact.png`
-
-```
-Build the Vendor Statement screen for Pavitram mobile app.
-
-[ATTACH: screenshots/04-vendor-statement-expanded.png]
-[ATTACH: screenshots/05-vendor-statement-compact.png]
-
-Create app/(auth)/vendor-statement.tsx:
-- Gets projectId and vendorId from query params via useLocalSearchParams (flat routing, no nested folders)
-- Fetches approved bills + payments for this vendor
-- Calculates summary: Paid, Outstanding, Pending
-
-UI:
-- AppHeader with back button, vendor name, right content: "Add Payment" button (admin only) and "Download" button (admin only)
-- Summary card: Paid | Outstanding | Pending
-- Toolbar row:
-  - Sort toggle: Newest/Oldest
-  - Filter segmented control: All | Bills | Payments
-  - Compact/Expanded toggle
-- Two view modes:
-  - Expanded: BillCard component (shows bill#, date, status badge, category, subcategory, amount) and PaymentCard component (shows payment method, date, amount)
-  - Compact: single-line rows with colored accent bar
-- FlatList with proper rendering
-- Status badges: Approved (blue), Payment Processed (violet)
-- Tap bill → navigate to bill edit page
-- Tap payment → navigate to payment edit page (admin only)
-
-Create components/BillCard.tsx, components/PaymentCard.tsx, components/CompactRow.tsx
-
-Match the layout from the attached screenshots (expanded + compact views). Reference ../pavitram-web-app/src/pages/VendorStatementPage.tsx for logic.
-```
-
----
-
-### Prompt 8: Vendor Pending Approval Screen
-
-> Attach screenshots: `screenshots/06-pending-approval.png` and `screenshots/07-pending-approval-compact.png`
-
-```
-Build the Vendor Pending Approval screen for Pavitram mobile app.
-
-[ATTACH: screenshots/06-pending-approval.png]
-[ATTACH: screenshots/07-pending-approval-compact.png]
-
-Create app/(auth)/vendor-pending.tsx:
-- Gets projectId and vendorId from query params via useLocalSearchParams (flat routing, no nested folders)
-- Fetches bills with status='submitted' for this vendor in this project
-
-UI:
-- AppHeader with back button, vendor name
-- Banner: vendor name, "Pending Approval" label, total pending amount
-- "Add Bill" button → navigates to bill edit with billId='new'
-- Toolbar: Sort toggle (Newest/Oldest), Compact toggle
-- FlatList of pending bills (BillCard or CompactRow based on view mode)
-- Sticky bottom bar: total pending amount (only visible when bills exist)
-- Empty state: "No pending bills" message
-- Tap bill → navigate to bill edit page
-
-Match the layout from the attached screenshots (expanded + compact views). Reference ../pavitram-web-app/src/pages/VendorPendingApprovalPage.tsx for logic.
-```
-
----
-
-### Prompt 9: Bill Add/Edit Screen
+### Prompt 7: Bill Add/Edit Screen
 
 > Attach screenshots: `screenshots/08-bill-add.png` and `screenshots/09-bill-edit-readonly.png`
+
+> **Why build this before Vendor Statement?** The vendor list and statement screens derive their data from bills and payments. Building these forms first lets you add test data so the list screens have something to display.
 
 ```
 Build the Bill Add/Edit screen for Pavitram mobile app.
@@ -1519,7 +1455,7 @@ Match the layout from the attached screenshots (add form + read-only view). Refe
 
 ---
 
-### Prompt 10: Payment Add/Edit Screen
+### Prompt 8: Payment Add/Edit Screen
 
 > Attach screenshots: `screenshots/10-payment-add.png` and `screenshots/11-payment-edit.png`
 
@@ -1547,6 +1483,72 @@ UI (ScrollView form):
 - Supabase insert / update operations (payments have no status — they are always recorded as-is)
 
 Match the layout from the attached screenshots. Reference ../pavitram-web-app/src/pages/PaymentEditPage.tsx for logic.
+```
+
+---
+
+### Prompt 9: Vendor Statement Screen
+
+> Attach screenshots: `screenshots/04-vendor-statement-expanded.png` and `screenshots/05-vendor-statement-compact.png`
+
+```
+Build the Vendor Statement screen for Pavitram mobile app.
+
+[ATTACH: screenshots/04-vendor-statement-expanded.png]
+[ATTACH: screenshots/05-vendor-statement-compact.png]
+
+Create app/(auth)/vendor-statement.tsx:
+- Gets projectId and vendorId from query params via useLocalSearchParams (flat routing, no nested folders)
+- Fetches approved bills + payments for this vendor
+- Calculates summary: Paid, Outstanding, Pending
+
+UI:
+- AppHeader with back button, vendor name, right content: "Add Payment" button (admin only) and "Download" button (admin only)
+- Summary card: Paid | Outstanding | Pending
+- Toolbar row:
+  - Sort toggle: Newest/Oldest
+  - Filter segmented control: All | Bills | Payments
+  - Compact/Expanded toggle
+- Two view modes:
+  - Expanded: BillCard component (shows bill#, date, status badge, category, subcategory, amount) and PaymentCard component (shows payment method, date, amount)
+  - Compact: single-line rows with colored accent bar
+- FlatList with proper rendering
+- Status badges: Approved (blue), Payment Processed (violet)
+- Tap bill → navigate to bill edit page
+- Tap payment → navigate to payment edit page (admin only)
+
+Create components/BillCard.tsx, components/PaymentCard.tsx, components/CompactRow.tsx
+
+Match the layout from the attached screenshots (expanded + compact views). Reference ../pavitram-web-app/src/pages/VendorStatementPage.tsx for logic.
+```
+
+---
+
+### Prompt 10: Vendor Pending Approval Screen
+
+> Attach screenshots: `screenshots/06-pending-approval.png` and `screenshots/07-pending-approval-compact.png`
+
+```
+Build the Vendor Pending Approval screen for Pavitram mobile app.
+
+[ATTACH: screenshots/06-pending-approval.png]
+[ATTACH: screenshots/07-pending-approval-compact.png]
+
+Create app/(auth)/vendor-pending.tsx:
+- Gets projectId and vendorId from query params via useLocalSearchParams (flat routing, no nested folders)
+- Fetches bills with status='submitted' for this vendor in this project
+
+UI:
+- AppHeader with back button, vendor name
+- Banner: vendor name, "Pending Approval" label, total pending amount
+- "Add Bill" button → navigates to bill edit with billId='new'
+- Toolbar: Sort toggle (Newest/Oldest), Compact toggle
+- FlatList of pending bills (BillCard or CompactRow based on view mode)
+- Sticky bottom bar: total pending amount (only visible when bills exist)
+- Empty state: "No pending bills" message
+- Tap bill → navigate to bill edit page
+
+Match the layout from the attached screenshots (expanded + compact views). Reference ../pavitram-web-app/src/pages/VendorPendingApprovalPage.tsx for logic.
 ```
 
 ---
