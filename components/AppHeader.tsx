@@ -50,14 +50,6 @@ export default function AppHeader({ title, showBack = false, onBack, rightConten
         {rightContent}
 
         <TouchableOpacity
-          onPress={() => router.push('/(auth)/settings')}
-          className="p-1 rounded-full active:bg-primary-600"
-          accessibilityLabel="Settings"
-        >
-          <Ionicons name="settings-outline" size={24} color="#ffffff" />
-        </TouchableOpacity>
-
-        <TouchableOpacity
           onPress={handleLogout}
           className="p-1 rounded-full active:bg-primary-600"
           accessibilityLabel="Sign out"

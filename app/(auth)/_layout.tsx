@@ -20,7 +20,6 @@ export default function AuthLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="projects/index" />
-      <Stack.Screen name="settings" />
     </Stack>
   );
 }
