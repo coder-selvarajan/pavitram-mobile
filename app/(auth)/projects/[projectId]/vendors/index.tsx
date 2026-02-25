@@ -34,22 +34,36 @@ export default function VendorListScreen() {
   const fetchData = useCallback(async () => {
     if (!projectId) return;
     try {
-      const [projectRes, vendorLinksRes, billsRes, paymentsRes] = await Promise.all([
+      const [projectRes, billsRes, paymentsRes] = await Promise.all([
         supabase.from('projects').select('*').eq('id', projectId).single(),
-        supabase.from('project_vendors').select('vendor_id, vendors(*)').eq('project_id', projectId),
         supabase.from('bills').select('*').eq('project_id', projectId),
         supabase.from('payments').select('*').eq('project_id', projectId),
       ]);
 
       if (projectRes.data) setProject(projectRes.data);
-      if (vendorLinksRes.data) {
-        const vendorList = vendorLinksRes.data
-          .map((link: any) => link.vendors as Vendor)
-          .filter(Boolean);
-        setVendors(vendorList);
+
+      const fetchedBills: Bill[] = billsRes.data ?? [];
+      const fetchedPayments: Payment[] = paymentsRes.data ?? [];
+      setBills(fetchedBills);
+      setPayments(fetchedPayments);
+
+      // Derive vendor list from bills and payments
+      const vendorIds = [
+        ...new Set([
+          ...fetchedBills.map((b) => b.vendor_id),
+          ...fetchedPayments.map((p) => p.vendor_id),
+        ]),
+      ];
+
+      if (vendorIds.length > 0) {
+        const { data: vendorData } = await supabase
+          .from('vendors')
+          .select('*')
+          .in('id', vendorIds);
+        setVendors(vendorData ?? []);
+      } else {
+        setVendors([]);
       }
-      if (billsRes.data) setBills(billsRes.data);
-      if (paymentsRes.data) setPayments(paymentsRes.data);
     } catch (err) {
       console.error('Error fetching vendor data:', err);
     } finally {

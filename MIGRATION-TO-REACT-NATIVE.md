@@ -538,11 +538,17 @@ const { data: projects } = await supabase
   .select('*')
   .order('project_name');
 
-// Fetch vendors for a project
-const { data: vendors } = await supabase
-  .from('project_vendors')
-  .select('vendor_id, vendors(id, vendor_name)')
-  .eq('project_id', projectId);
+// Fetch vendors for a project (derived from bills and payments)
+// First fetch bills and payments, then get unique vendor_ids
+const billsRes = await supabase.from('bills').select('*').eq('project_id', projectId);
+const paymentsRes = await supabase.from('payments').select('*').eq('project_id', projectId);
+const vendorIds = [...new Set([
+  ...(billsRes.data ?? []).map(b => b.vendor_id),
+  ...(paymentsRes.data ?? []).map(p => p.vendor_id),
+])];
+const { data: vendors } = vendorIds.length > 0
+  ? await supabase.from('vendors').select('*').in('id', vendorIds)
+  : { data: [] };
 
 // Fetch bills for a project + vendor
 const { data: bills } = await supabase
@@ -740,17 +746,7 @@ CREATE TABLE vendors (
 );
 
 -- ============================================
--- 5. PROJECT_VENDORS (many-to-many)
--- ============================================
-CREATE TABLE project_vendors (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
-  vendor_id UUID REFERENCES vendors(id) ON DELETE CASCADE,
-  UNIQUE(project_id, vendor_id)
-);
-
--- ============================================
--- 6. PURCHASE_CATEGORIES (reference table)
+-- 5. PURCHASE_CATEGORIES (reference table)
 -- One row per category, subcategories as comma-separated string
 -- ============================================
 CREATE TABLE purchase_categories (
@@ -823,8 +819,6 @@ CREATE INDEX idx_payments_date ON payments(date);
 CREATE INDEX idx_payments_method ON payments(payment_method_id);
 CREATE INDEX idx_user_projects_user ON user_projects(user_id);
 CREATE INDEX idx_user_projects_project ON user_projects(project_id);
-CREATE INDEX idx_project_vendors_project ON project_vendors(project_id);
-CREATE INDEX idx_project_vendors_vendor ON project_vendors(vendor_id);
 ```
 
 ### 10.2 — Row Level Security (RLS) policies
@@ -839,7 +833,6 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
-ALTER TABLE project_vendors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE purchase_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bills ENABLE ROW LEVEL SECURITY;
@@ -896,13 +889,6 @@ CREATE POLICY "View user_projects"
 -- ----------------------------------------
 CREATE POLICY "Authenticated users can view vendors"
   ON vendors FOR SELECT
-  USING (auth.uid() IS NOT NULL);
-
--- ----------------------------------------
--- PROJECT_VENDORS: Viewable by authenticated users
--- ----------------------------------------
-CREATE POLICY "Authenticated users can view project_vendors"
-  ON project_vendors FOR SELECT
   USING (auth.uid() IS NOT NULL);
 
 -- ----------------------------------------
@@ -1139,15 +1125,7 @@ INSERT INTO vendors (id, vendor_name) VALUES
   (uuid_generate_v4(), 'Jaswanth Hardwares');
 
 -- ----------------------------------------
--- Step 6: Assign vendors to projects
--- Assign all vendors to all projects (adjust as needed)
--- ----------------------------------------
-INSERT INTO project_vendors (project_id, vendor_id)
-SELECT p.id, v.id
-FROM projects p, vendors v;
-
--- ----------------------------------------
--- Step 7: Insert payment methods (bank accounts)
+-- Step 6: Insert payment methods (bank accounts)
 -- ----------------------------------------
 INSERT INTO payment_methods (id, name, opening_balance) VALUES
   (uuid_generate_v4(), 'Pavitram ICICI', 0),
@@ -1177,7 +1155,13 @@ INSERT INTO purchase_categories (category, subcategories) VALUES
 -- ============================================
 
 -- Vendor summary view (pre-calculates Paid, Outstanding, Pending)
+-- Derives vendors per project from bills and payments (no project_vendors table)
 CREATE OR REPLACE VIEW vendor_summary AS
+WITH project_vendor_ids AS (
+  SELECT DISTINCT project_id, vendor_id FROM bills
+  UNION
+  SELECT DISTINCT project_id, vendor_id FROM payments
+)
 SELECT
   pv.project_id,
   pv.vendor_id,
@@ -1185,7 +1169,7 @@ SELECT
   COALESCE(pay.total_paid, 0) AS paid,
   COALESCE(b_approved.total_approved, 0) - COALESCE(pay.total_paid, 0) AS outstanding,
   COALESCE(b_pending.total_pending, 0) AS pending_approval
-FROM project_vendors pv
+FROM project_vendor_ids pv
 JOIN vendors v ON v.id = pv.vendor_id
 LEFT JOIN (
   SELECT project_id, vendor_id, SUM(amount) AS total_paid
@@ -1395,8 +1379,8 @@ Build the Vendor List screen for Pavitram mobile app.
 
 Create app/(auth)/projects/[projectId]/vendors/index.tsx:
 - Gets projectId from route params
-- Fetches vendors for this project (via project_vendors join table)
-- Fetches bills and payments for this project to calculate per-vendor summaries:
+- Derives vendor list from bills and payments for this project (vendors with at least one bill or payment)
+- Calculates per-vendor summaries:
   - Paid = sum(payments for the vendor/project)
   - Outstanding = sum(approved bills) - Paid
   - Pending = sum(bills where status in submitted, payment_done, payment_completed)
