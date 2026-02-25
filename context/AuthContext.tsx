@@ -32,14 +32,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setLoading(false);
       }
+    }).catch(() => {
+      // Session retrieval failed (e.g. invalid refresh token) — treat as signed out
+      setCurrentUser(null);
+      setLoading(false);
     });
 
-    // Listen for auth state changes
+    // Listen for auth state changes (including token refresh failures)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        if (session?.user) {
-          await fetchUserProfile(session.user.id);
-        } else {
+        try {
+          if (session?.user) {
+            await fetchUserProfile(session.user.id);
+          } else {
+            setCurrentUser(null);
+            setLoading(false);
+          }
+        } catch {
+          // Guard against unexpected errors during auth state handling
           setCurrentUser(null);
           setLoading(false);
         }

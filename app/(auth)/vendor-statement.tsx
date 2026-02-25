@@ -269,8 +269,13 @@ export default function VendorStatementScreen() {
                 key={f}
                 onPress={() => setFilter(f)}
                 className={`px-2.5 py-1 rounded-full ${
-                  filter === f ? 'bg-primary-500 shadow-sm' : ''
+                  filter === f ? 'bg-primary-500' : ''
                 }`}
+                style={
+                  filter === f
+                    ? { shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 1, elevation: 1 }
+                    : undefined
+                }
                 activeOpacity={0.7}
               >
                 <Text
