@@ -92,7 +92,7 @@ export default function ProjectListScreen() {
 
   const renderProject = ({ item, index }: { item: ProjectWithOutstanding; index: number }) => (
     <TouchableOpacity
-      onPress={() => router.push(`/(auth)/projects/${item.id}/vendors`)}
+      onPress={() => router.push(`/(auth)/vendors?projectId=${item.id}`)}
       className="bg-white rounded-xl shadow-sm border border-gray-100 mx-3 mb-2 px-3 py-2.5 flex-row items-center gap-2.5"
       activeOpacity={0.7}
     >

@@ -9,9 +9,10 @@ import {
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '../../../../../lib/supabase';
-import AppHeader from '../../../../../components/AppHeader';
-import type { Project, Vendor, Bill, Payment } from '../../../../../types';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
+import AppHeader from '../../components/AppHeader';
+import type { Project, Vendor, Bill, Payment } from '../../types';
 
 const fmt = (n: number) => '₹' + n.toLocaleString('en-IN');
 
@@ -23,6 +24,7 @@ interface VendorWithSummary extends Vendor {
 
 export default function VendorListScreen() {
   const { projectId } = useLocalSearchParams<{ projectId: string }>();
+  const { currentUser } = useAuth();
 
   const [project, setProject] = useState<Project | null>(null);
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -30,6 +32,8 @@ export default function VendorListScreen() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  const isAdmin = currentUser?.role === 'admin';
 
   const fetchData = useCallback(async () => {
     if (!projectId) return;
@@ -127,7 +131,7 @@ export default function VendorListScreen() {
         <View className="flex-row items-center gap-1.5">
           <TouchableOpacity
             onPress={() =>
-              router.push(`/(auth)/projects/${projectId}/vendors/${item.id}/statement`)
+              router.push(`/(auth)/vendor-statement?projectId=${projectId}&vendorId=${item.id}`)
             }
             className="p-1.5 rounded-lg bg-blue-50"
             activeOpacity={0.7}
@@ -137,7 +141,7 @@ export default function VendorListScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
-              router.push(`/(auth)/projects/${projectId}/vendors/${item.id}/pending`)
+              router.push(`/(auth)/vendor-pending?projectId=${projectId}&vendorId=${item.id}`)
             }
             className="p-1.5 rounded-lg bg-amber-50"
             activeOpacity={0.7}
@@ -207,6 +211,32 @@ export default function VendorListScreen() {
             <Text className="text-white/70 text-[10px]">Pending</Text>
             <Text className="text-white text-sm font-bold">{fmt(totals.pendingApproval)}</Text>
           </View>
+        </View>
+
+        {/* Add Bill / Add Payment quick action buttons */}
+        <View className="flex-row gap-2 mt-2">
+          <TouchableOpacity
+            onPress={() =>
+              router.push(`/(auth)/bill-edit?projectId=${projectId}&billId=new`)
+            }
+            className="flex-row items-center gap-1 bg-white/20 px-2.5 py-1.5 rounded-full"
+            activeOpacity={0.7}
+          >
+            <Ionicons name="receipt-outline" size={13} color="#ffffff" />
+            <Text className="text-white text-xs font-medium">Add Bill</Text>
+          </TouchableOpacity>
+          {isAdmin && (
+            <TouchableOpacity
+              onPress={() =>
+                router.push(`/(auth)/payment-edit?projectId=${projectId}&paymentId=new`)
+              }
+              className="flex-row items-center gap-1 bg-white/20 px-2.5 py-1.5 rounded-full"
+              activeOpacity={0.7}
+            >
+              <Ionicons name="card-outline" size={13} color="#ffffff" />
+              <Text className="text-white text-xs font-medium">Add Payment</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 

@@ -224,18 +224,11 @@ pavitram-mobile/
 │   │   ├── _layout.tsx           # Auth check wrapper
 │   │   ├── projects/
 │   │   │   └── index.tsx         # Project list
-│   │   ├── projects/
-│   │   │   └── [projectId]/
-│   │   │       ├── vendors/
-│   │   │       │   └── index.tsx             # Vendor list
-│   │   │       └── vendors/
-│   │   │           └── [vendorId]/
-│   │   │               ├── statement.tsx     # Vendor statement
-│   │   │               ├── pending.tsx       # Pending approval
-│   │   │               ├── bills/
-│   │   │               │   └── [billId].tsx  # Bill add/edit
-│   │   │               └── payments/
-│   │   │                   └── [paymentId].tsx # Payment add/edit
+│   │   ├── vendors.tsx           # Vendor list / Project detail (params: projectId)
+│   │   ├── vendor-statement.tsx  # Vendor statement (params: projectId, vendorId)
+│   │   ├── vendor-pending.tsx    # Pending approval (params: projectId, vendorId)
+│   │   ├── bill-edit.tsx         # Bill add/edit (params: projectId, vendorId, billId)
+│   │   ├── payment-edit.tsx      # Payment add/edit (params: projectId, vendorId, paymentId)
 │   │   └── settings.tsx          # Settings screen
 ├── components/                   # Shared components
 │   ├── AppHeader.tsx
@@ -403,22 +396,25 @@ Build each screen sequentially. Below is the order, mapping web page → native 
 **Components**: FlatList, TouchableOpacity
 **Key changes**:
 - `<div>` list → `<FlatList>` with `renderItem`
-- Click handler → `router.push(\`/projects/${projectId}/vendors\`)`
+- Click handler → `router.push(\`/(auth)/vendors?projectId=${projectId}\`)`
 - Currency formatting same (`toLocaleString('en-IN')`)
 - Summary banner → sticky header or top card
 
 ---
 
-### Screen 3: Vendor List
+### Screen 3: Vendor List (Project Detail)
 
 | Web | Native |
 |-----|--------|
-| `src/pages/VendorListPage.tsx` | `app/(auth)/projects/[projectId]/vendors/index.tsx` |
+| `src/pages/VendorListPage.tsx` | `app/(auth)/vendors.tsx` |
 
+**Route params**: `projectId` (passed as query param)
 **Components**: FlatList, summary card
 **Key changes**:
+- Gets `projectId` from `useLocalSearchParams()` (query param, not path segment)
 - Vendor cards with Paid/Outstanding/Pending
 - Action buttons (Statement / Pending) → icon buttons with `router.push()`
+- Small "Add Bill" and "Add Payment" buttons in the header/toolbar area for quick access
 
 ---
 
@@ -426,7 +422,9 @@ Build each screen sequentially. Below is the order, mapping web page → native 
 
 | Web | Native |
 |-----|--------|
-| `src/pages/VendorStatementPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/statement.tsx` |
+| `src/pages/VendorStatementPage.tsx` | `app/(auth)/vendor-statement.tsx` |
+
+**Route params**: `projectId`, `vendorId` (passed as query params)
 
 **Components**: FlatList, SegmentedControl, BillCard, PaymentCard
 **Key changes**:
@@ -441,7 +439,9 @@ Build each screen sequentially. Below is the order, mapping web page → native 
 
 | Web | Native |
 |-----|--------|
-| `src/pages/VendorPendingApprovalPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/pending.tsx` |
+| `src/pages/VendorPendingApprovalPage.tsx` | `app/(auth)/vendor-pending.tsx` |
+
+**Route params**: `projectId`, `vendorId` (passed as query params)
 
 **Components**: FlatList, sticky bottom bar
 **Key changes**:
@@ -454,7 +454,9 @@ Build each screen sequentially. Below is the order, mapping web page → native 
 
 | Web | Native |
 |-----|--------|
-| `src/pages/BillEditPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/bills/[billId].tsx` |
+| `src/pages/BillEditPage.tsx` | `app/(auth)/bill-edit.tsx` |
+
+**Route params**: `projectId`, `vendorId`, `billId` (passed as query params)
 
 **Components**: ScrollView, TextInput, Picker/dropdown, DateTimePicker
 **Key changes**:
@@ -470,7 +472,9 @@ Build each screen sequentially. Below is the order, mapping web page → native 
 
 | Web | Native |
 |-----|--------|
-| `src/pages/PaymentEditPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/payments/[paymentId].tsx` |
+| `src/pages/PaymentEditPage.tsx` | `app/(auth)/payment-edit.tsx` |
+
+**Route params**: `projectId`, `vendorId`, `paymentId` (passed as query params)
 
 **Components**: ScrollView, TextInput, Picker, DateTimePicker
 **Key changes**: Same patterns as Bill Edit but simpler (fewer fields)
@@ -1359,7 +1363,7 @@ UI:
   - Index badge (1, 2, 3...)
   - Project name
   - Outstanding amount in Indian rupee format
-- Tap project → router.push(`/(auth)/projects/${project.id}/vendors`)
+- Tap project → router.push(`/(auth)/vendors?projectId=${project.id}`)
 - Pull-to-refresh support
 - Loading state with ActivityIndicator
 
@@ -1373,12 +1377,12 @@ Match the layout from the attached screenshot. Reference ../pavitram-web-app/src
 > Attach screenshot: `screenshots/03-vendor-list.png`
 
 ```
-Build the Vendor List screen for Pavitram mobile app.
+Build the Vendor List / Project Detail screen for Pavitram mobile app.
 
 [ATTACH: screenshots/03-vendor-list.png]
 
-Create app/(auth)/projects/[projectId]/vendors/index.tsx:
-- Gets projectId from route params
+Create app/(auth)/vendors.tsx:
+- Gets projectId from query params via useLocalSearchParams (NOT path segments — flat routing, no [projectId] folders)
 - Derives vendor list from bills and payments for this project (vendors with at least one bill or payment)
 - Calculates per-vendor summaries:
   - Paid = sum(payments for the vendor/project)
@@ -1389,14 +1393,17 @@ Create app/(auth)/projects/[projectId]/vendors/index.tsx:
 UI:
 - AppHeader with back button, project name as title
 - Summary banner: Paid | Outstanding | Pending Approval (project totals)
+- Small "Add Bill" and "Add Payment" buttons below the summary banner (compact row, small rounded buttons with icons). These navigate to the bill-edit and payment-edit pages with projectId pre-filled and vendorId empty (user selects vendor in the form).
 - FlatList of vendor cards, each showing:
   - Vendor name
   - Paid, Outstanding, Pending amounts
   - Two action icon buttons:
-    - Statement icon (blue) → navigates to statement page
-    - Pending icon (amber) → navigates to pending page
+    - Statement icon (blue) → router.push(`/(auth)/vendor-statement?projectId=${projectId}&vendorId=${vendorId}`)
+    - Pending icon (amber) → router.push(`/(auth)/vendor-pending?projectId=${projectId}&vendorId=${vendorId}`)
 - Pull-to-refresh
 - Empty state for no vendors
+
+Navigation pattern: All sub-pages use query params (e.g., ?projectId=xxx&vendorId=xxx) instead of nested path segments.
 
 Match the layout from the attached screenshot. Reference ../pavitram-web-app/src/pages/VendorListPage.tsx for logic.
 ```
@@ -1413,8 +1420,8 @@ Build the Vendor Statement screen for Pavitram mobile app.
 [ATTACH: screenshots/04-vendor-statement-expanded.png]
 [ATTACH: screenshots/05-vendor-statement-compact.png]
 
-Create app/(auth)/projects/[projectId]/vendors/[vendorId]/statement.tsx:
-- Gets projectId and vendorId from route params
+Create app/(auth)/vendor-statement.tsx:
+- Gets projectId and vendorId from query params via useLocalSearchParams (flat routing, no nested folders)
 - Fetches approved bills + payments for this vendor
 - Calculates summary: Paid, Outstanding, Pending
 
@@ -1450,8 +1457,8 @@ Build the Vendor Pending Approval screen for Pavitram mobile app.
 [ATTACH: screenshots/06-pending-approval.png]
 [ATTACH: screenshots/07-pending-approval-compact.png]
 
-Create app/(auth)/projects/[projectId]/vendors/[vendorId]/pending.tsx:
-- Gets projectId and vendorId from route params
+Create app/(auth)/vendor-pending.tsx:
+- Gets projectId and vendorId from query params via useLocalSearchParams (flat routing, no nested folders)
 - Fetches bills with status='submitted' for this vendor in this project
 
 UI:
@@ -1479,7 +1486,8 @@ Build the Bill Add/Edit screen for Pavitram mobile app.
 [ATTACH: screenshots/08-bill-add.png]
 [ATTACH: screenshots/09-bill-edit-readonly.png]
 
-Create app/(auth)/projects/[projectId]/vendors/[vendorId]/bills/[billId].tsx:
+Create app/(auth)/bill-edit.tsx:
+- Gets projectId, vendorId, billId from query params via useLocalSearchParams (flat routing, no nested folders)
 - billId='new' for create, otherwise edit existing
 - Fetches existing bill data if editing
 - Read-only mode for non-admin users on non-open bills
@@ -1521,7 +1529,8 @@ Build the Payment Add/Edit screen for Pavitram mobile app.
 [ATTACH: screenshots/10-payment-add.png]
 [ATTACH: screenshots/11-payment-edit.png]
 
-Create app/(auth)/projects/[projectId]/vendors/[vendorId]/payments/[paymentId].tsx:
+Create app/(auth)/payment-edit.tsx:
+- Gets projectId, vendorId, paymentId from query params via useLocalSearchParams (flat routing, no nested folders)
 - Admin-only screen (show access denied message for non-admin)
 - paymentId='new' for create, otherwise edit existing
 
@@ -1609,11 +1618,11 @@ This is the complete mapping from web app files to the mobile equivalents:
 | `src/components/ProtectedRoute.tsx` | `app/(auth)/_layout.tsx` | Auth guard |
 | `src/pages/LoginPage.tsx` | `app/login.tsx` | Login screen |
 | `src/pages/ProjectListPage.tsx` | `app/(auth)/projects/index.tsx` | Project list |
-| `src/pages/VendorListPage.tsx` | `app/(auth)/projects/[projectId]/vendors/index.tsx` | Vendor list |
-| `src/pages/VendorStatementPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/statement.tsx` | Vendor statement |
-| `src/pages/VendorPendingApprovalPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/pending.tsx` | Pending bills |
-| `src/pages/BillEditPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/bills/[billId].tsx` | Bill form |
-| `src/pages/PaymentEditPage.tsx` | `app/(auth)/projects/[projectId]/vendors/[vendorId]/payments/[paymentId].tsx` | Payment form |
+| `src/pages/VendorListPage.tsx` | `app/(auth)/vendors.tsx` | Vendor list / Project detail (params: projectId) |
+| `src/pages/VendorStatementPage.tsx` | `app/(auth)/vendor-statement.tsx` | Vendor statement (params: projectId, vendorId) |
+| `src/pages/VendorPendingApprovalPage.tsx` | `app/(auth)/vendor-pending.tsx` | Pending bills (params: projectId, vendorId) |
+| `src/pages/BillEditPage.tsx` | `app/(auth)/bill-edit.tsx` | Bill form (params: projectId, vendorId, billId) |
+| `src/pages/PaymentEditPage.tsx` | `app/(auth)/payment-edit.tsx` | Payment form (params: projectId, vendorId, paymentId) |
 | `src/pages/SettingsPage.tsx` | `app/(auth)/settings.tsx` | Settings |
 | `src/App.tsx` (routes) | `app/` directory structure | Routing |
 | `src/index.css` (theme) | `tailwind.config.js` + `global.css` | Styling |
