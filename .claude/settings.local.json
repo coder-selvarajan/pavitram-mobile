@@ -16,7 +16,8 @@
       "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/statement.tsx\")",
       "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/pending.tsx\")",
       "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/bills/[billId].tsx\")",
-      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/payments/[paymentId].tsx\")"
+      "Bash(cat \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/projects/[projectId]/vendors/[vendorId]/payments/[paymentId].tsx\")",
+      "Bash(ls -la \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/\")"
     ]
   }
 }
