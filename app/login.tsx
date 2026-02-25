@@ -83,16 +83,19 @@ export default function LoginScreen() {
 
           {/* Username */}
           <Text className="text-xs font-medium text-gray-700 mb-1">Username</Text>
-          <TextInput
-            className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 bg-primary-50/50 mb-4"
-            placeholder="Enter username"
-            placeholderTextColor="#9ca3af"
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            autoCorrect={false}
-            editable={!loading}
-          />
+          <View className="flex-row items-center border border-gray-300 rounded-xl bg-primary-50/50 mb-4">
+            <TextInput
+              className="flex-1 px-4 py-3 text-sm text-gray-800"
+              placeholder="Enter username"
+              placeholderTextColor="#9ca3af"
+              value={username}
+              onChangeText={setUsername}
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!loading}
+            />
+            <Text className="text-sm text-gray-400 pr-4">@pavitram.app</Text>
+          </View>
 
           {/* Password */}
           <Text className="text-xs font-medium text-gray-700 mb-1">Password</Text>
