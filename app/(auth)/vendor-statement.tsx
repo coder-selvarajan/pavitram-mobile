@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -75,6 +76,7 @@ export default function VendorStatementScreen() {
       setMethodMap(map);
     } catch (err) {
       console.error('Error fetching vendor statement data:', err);
+      Alert.alert('Error', 'Failed to load statement. Pull down to retry.');
     } finally {
       setLoading(false);
       setRefreshing(false);

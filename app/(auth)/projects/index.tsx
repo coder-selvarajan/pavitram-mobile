@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -42,6 +43,7 @@ export default function ProjectListScreen() {
       if (paymentsRes.data) setPayments(paymentsRes.data);
     } catch (err) {
       console.error('Error fetching project data:', err);
+      Alert.alert('Error', 'Failed to load projects. Pull down to retry.');
     } finally {
       setLoading(false);
       setRefreshing(false);

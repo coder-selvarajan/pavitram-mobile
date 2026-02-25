@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -142,6 +143,7 @@ export default function VendorPendingScreen() {
       setBills(billsRes.data ?? []);
     } catch (err) {
       console.error('Error fetching pending bills:', err);
+      Alert.alert('Error', 'Failed to load pending bills. Pull down to retry.');
     } finally {
       setLoading(false);
       setRefreshing(false);

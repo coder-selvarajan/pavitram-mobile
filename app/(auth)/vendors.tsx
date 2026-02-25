@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -70,6 +71,7 @@ export default function VendorListScreen() {
       }
     } catch (err) {
       console.error('Error fetching vendor data:', err);
+      Alert.alert('Error', 'Failed to load vendors. Pull down to retry.');
     } finally {
       setLoading(false);
       setRefreshing(false);
