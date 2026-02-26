@@ -32,7 +32,11 @@
       "Bash(cat \"app/\\(auth\\)/_layout.tsx\")",
       "Bash(xargs ls -la)",
       "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/lib\"/*.ts)",
-      "Bash(ls \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/\")"
+      "Bash(ls \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/\")",
+      "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/vendor-statement.tsx\")",
+      "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/bill-edit.tsx\")",
+      "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/payment-edit.tsx\")",
+      "Bash(grep -n \"\\\\.single\\(\\)\" \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/\"*.tsx)"
     ]
   }
 }
