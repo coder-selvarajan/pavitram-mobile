@@ -760,7 +760,26 @@ CREATE TABLE purchase_categories (
 );
 
 -- ============================================
--- 7. PAYMENT_METHODS (bank accounts)
+-- 6. CUSTOMERS TABLE (for sales module)
+-- ============================================
+CREATE TABLE customers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  customer_name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ============================================
+-- 7. SALES_CATEGORIES (reference table for sales module)
+-- One row per category, subcategories as comma-separated string
+-- ============================================
+CREATE TABLE sales_categories (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  category TEXT NOT NULL UNIQUE,
+  subcategories TEXT NOT NULL  -- comma-separated values
+);
+
+-- ============================================
+-- 8. PAYMENT_METHODS (bank accounts)
 -- ============================================
 CREATE TABLE payment_methods (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -770,7 +789,7 @@ CREATE TABLE payment_methods (
 );
 
 -- ============================================
--- 8. BILLS TABLE
+-- 9. BILLS TABLE
 -- ============================================
 CREATE TABLE bills (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -794,7 +813,7 @@ CREATE TABLE bills (
 );
 
 -- ============================================
--- 9. PAYMENTS TABLE (independent of bills)
+-- 10. PAYMENTS TABLE (independent of bills)
 -- ============================================
 CREATE TABLE payments (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -811,7 +830,7 @@ CREATE TABLE payments (
 );
 
 -- ============================================
--- 10. INDEXES for performance
+-- 11. INDEXES for performance
 -- ============================================
 CREATE INDEX idx_bills_project ON bills(project_id);
 CREATE INDEX idx_bills_vendor ON bills(vendor_id);
@@ -837,6 +856,8 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sales_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE purchase_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bills ENABLE ROW LEVEL SECURITY;
@@ -893,6 +914,20 @@ CREATE POLICY "View user_projects"
 -- ----------------------------------------
 CREATE POLICY "Authenticated users can view vendors"
   ON vendors FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+-- ----------------------------------------
+-- CUSTOMERS: All authenticated users can view customers
+-- ----------------------------------------
+CREATE POLICY "Authenticated users can view customers"
+  ON customers FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+-- ----------------------------------------
+-- SALES_CATEGORIES: Read-only for all authenticated users
+-- ----------------------------------------
+CREATE POLICY "Authenticated users can view sales categories"
+  ON sales_categories FOR SELECT
   USING (auth.uid() IS NOT NULL);
 
 -- ----------------------------------------
@@ -1149,6 +1184,66 @@ INSERT INTO purchase_categories (category, subcategories) VALUES
   ('EB', 'New Connection,Service Line Items and Work,Usage Bill'),
   ('Borewell', 'Drilling work,Labour,Motor and accessories,Other,Accessories'),
   ('Plan Approval', 'Drawing Expenses,Fees,Office expenses,Other Expenses,Working Drawing,Bank Estimation');
+
+-- ----------------------------------------
+-- Step 9: Insert customers (for sales module)
+-- ----------------------------------------
+INSERT INTO customers (id, customer_name) VALUES
+  (uuid_generate_v4(), 'NA'),
+  (uuid_generate_v4(), 'Sameera@Vengai 8 Acres'),
+  (uuid_generate_v4(), 'Sameera@Vengai Arch'),
+  (uuid_generate_v4(), 'Sameera@Vengai Approach Road'),
+  (uuid_generate_v4(), 'Pradhyum@Mamandur Office'),
+  (uuid_generate_v4(), 'Pradhyum@Mamandur 9 Acres'),
+  (uuid_generate_v4(), 'Sameera@Walaja CWall'),
+  (uuid_generate_v4(), 'Sameera@Mamandur NMR'),
+  (uuid_generate_v4(), 'Sameera@Vengai NMR'),
+  (uuid_generate_v4(), 'Sameera@Vedal NMR'),
+  (uuid_generate_v4(), 'Sameera@KPM NMR'),
+  (uuid_generate_v4(), 'Sameera@Malarippakkam'),
+  (uuid_generate_v4(), 'Kundathur Labour Payment'),
+  (uuid_generate_v4(), 'Vedal Labour Payment'),
+  (uuid_generate_v4(), 'T.Zisai Labour Payment'),
+  (uuid_generate_v4(), 'Sameera@Karai Pile Work'),
+  (uuid_generate_v4(), 'Vengai Labour Payment'),
+  (uuid_generate_v4(), 'Cgl Labour Payment'),
+  (uuid_generate_v4(), 'Sameera@Karai Kerb Work'),
+  (uuid_generate_v4(), 'Srinivas@Customer (Vengai 414)'),
+  (uuid_generate_v4(), 'Koduvalli Labour Payment'),
+  (uuid_generate_v4(), 'Prabu@Customer (Vengai 166)'),
+  (uuid_generate_v4(), 'Dhanalakshmi@Vengai 4E Part'),
+  (uuid_generate_v4(), 'Sameera@Vengai 4 Acres'),
+  (uuid_generate_v4(), 'Sameera@Karai PreCast Wall'),
+  (uuid_generate_v4(), 'Shyam@Karai 15'),
+  (uuid_generate_v4(), 'Sameera@Arcot PreCast Wall'),
+  (uuid_generate_v4(), 'Walaja Labour Payment'),
+  (uuid_generate_v4(), 'Lotus Labour Payment'),
+  (uuid_generate_v4(), 'Sameera@Labour Payment'),
+  (uuid_generate_v4(), 'Sameera@Vedal Wall Work'),
+  (uuid_generate_v4(), 'Sameera@Walaja Office Back CWall'),
+  (uuid_generate_v4(), 'Sameera@Walaja Arch'),
+  (uuid_generate_v4(), 'Sameera@Vengai Sports'),
+  (uuid_generate_v4(), 'Sameera@Vandranthangal'),
+  (uuid_generate_v4(), 'Sameera@Vegai CWall'),
+  (uuid_generate_v4(), 'NMR Adjustment'),
+  (uuid_generate_v4(), 'Sameera@Vrinjipuram'),
+  (uuid_generate_v4(), 'Sameera@Walaja Phase 2'),
+  (uuid_generate_v4(), 'Sameera@Vengai Park'),
+  (uuid_generate_v4(), 'Sameera@Vedal 1.35 Acres'),
+  (uuid_generate_v4(), 'Sameera@NMR Payment'),
+  (uuid_generate_v4(), 'Pradhyum@Mamandur Road Crossing'),
+  (uuid_generate_v4(), 'Sameera@Vengai 3.26 Acres'),
+  (uuid_generate_v4(), 'Sameera@Madura-Temp-Bridge');
+
+-- ----------------------------------------
+-- Step 10: Insert sales categories (one row per category, subcategories as CSV)
+-- ----------------------------------------
+INSERT INTO sales_categories (category, subcategories) VALUES
+  ('Materials Supply', 'RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5'),
+  ('Road Development', 'RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5'),
+  ('Park Development', 'RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5'),
+  ('Arch Development', 'RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5'),
+  ('Villa Construction', 'RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5');
 ```
 
 ### 10.4 — Useful Supabase views (optional, for performance)
