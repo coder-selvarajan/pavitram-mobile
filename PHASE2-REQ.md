@@ -19,6 +19,10 @@ id,category,subcategory
 4,Arch Development,"RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5"
 5,Villa Construction,"RA Bill 1,RA Bill 2,RA Bill 3,RA Bill 4,RA Bill 5"
 
+Can you also duplicate 'bills, payments' tables for the Sales module? just replace vendor_id with customer_id.. and all the fields remain same. 
+create appropriate scripts in @MIGRATION-TO-REACT-NATIVE.md file.
+
+
 Also create a tab view with below tabs..  
 
 - Home, Projects, Purchase, Sales, Reports

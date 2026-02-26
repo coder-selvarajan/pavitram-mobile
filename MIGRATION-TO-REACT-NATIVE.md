@@ -830,7 +830,48 @@ CREATE TABLE payments (
 );
 
 -- ============================================
--- 11. INDEXES for performance
+-- 11. BILLS_SALES TABLE (sales module — same as bills but with customer_id)
+-- ============================================
+CREATE TABLE bills_sales (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  bill_number TEXT,
+  date DATE NOT NULL,
+  amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  discount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  category TEXT CHECK (category IN (
+    'Materials Supply', 'Road Development', 'Park Development', 'Arch Development', 'Villa Construction'
+  )),
+  subcategory TEXT,
+  gst INTEGER DEFAULT 0 CHECK (gst IN (0, 5, 18)),
+  description TEXT,
+  status TEXT NOT NULL DEFAULT 'submitted' CHECK (status IN ('submitted', 'approved', 'payment_processed')),
+  created_by UUID REFERENCES users(id),
+  created_date TIMESTAMPTZ DEFAULT now(),
+  modified_by UUID REFERENCES users(id),
+  modified_date TIMESTAMPTZ DEFAULT now()
+);
+
+-- ============================================
+-- 12. PAYMENTS_SALES TABLE (sales module — same as payments but with customer_id)
+-- ============================================
+CREATE TABLE payments_sales (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  amount NUMERIC(12,2) NOT NULL DEFAULT 0,
+  payment_method_id UUID NOT NULL REFERENCES payment_methods(id),
+  description TEXT,
+  created_by UUID REFERENCES users(id),
+  created_date TIMESTAMPTZ DEFAULT now(),
+  modified_by UUID REFERENCES users(id),
+  modified_date TIMESTAMPTZ DEFAULT now()
+);
+
+-- ============================================
+-- 13. INDEXES for performance
 -- ============================================
 CREATE INDEX idx_bills_project ON bills(project_id);
 CREATE INDEX idx_bills_vendor ON bills(vendor_id);
@@ -842,6 +883,14 @@ CREATE INDEX idx_payments_date ON payments(date);
 CREATE INDEX idx_payments_method ON payments(payment_method_id);
 CREATE INDEX idx_user_projects_user ON user_projects(user_id);
 CREATE INDEX idx_user_projects_project ON user_projects(project_id);
+CREATE INDEX idx_bills_sales_project ON bills_sales(project_id);
+CREATE INDEX idx_bills_sales_customer ON bills_sales(customer_id);
+CREATE INDEX idx_bills_sales_status ON bills_sales(status);
+CREATE INDEX idx_bills_sales_date ON bills_sales(date);
+CREATE INDEX idx_payments_sales_project ON payments_sales(project_id);
+CREATE INDEX idx_payments_sales_customer ON payments_sales(customer_id);
+CREATE INDEX idx_payments_sales_date ON payments_sales(date);
+CREATE INDEX idx_payments_sales_method ON payments_sales(payment_method_id);
 ```
 
 ### 10.2 — Row Level Security (RLS) policies
@@ -862,6 +911,8 @@ ALTER TABLE purchase_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payment_methods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bills ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bills_sales ENABLE ROW LEVEL SECURITY;
+ALTER TABLE payments_sales ENABLE ROW LEVEL SECURITY;
 
 -- ----------------------------------------
 -- Helper function: Get current user's role
@@ -1010,6 +1061,74 @@ CREATE POLICY "Admin can update payments"
 -- DELETE: Admin only
 CREATE POLICY "Admin can delete payments"
   ON payments FOR DELETE
+  USING (get_user_role() = 'admin');
+
+-- ----------------------------------------
+-- BILLS_SALES: Policies (same as bills but for sales module)
+-- ----------------------------------------
+
+-- SELECT: Users see sales bills for their assigned projects, admins see all
+CREATE POLICY "View sales bills"
+  ON bills_sales FOR SELECT
+  USING (
+    get_user_role() = 'admin'
+    OR project_id IN (
+      SELECT project_id FROM user_projects
+      WHERE user_id = get_user_id()
+    )
+  );
+
+-- INSERT: All authenticated users can create sales bills
+CREATE POLICY "Users can create sales bills"
+  ON bills_sales FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL);
+
+-- UPDATE: Admin can update any sales bill; users can only update their own submitted sales bills
+CREATE POLICY "Admin can update all sales bills"
+  ON bills_sales FOR UPDATE
+  USING (get_user_role() = 'admin');
+
+CREATE POLICY "Users can update own submitted sales bills"
+  ON bills_sales FOR UPDATE
+  USING (
+    get_user_role() = 'user'
+    AND status = 'submitted'
+    AND created_by = get_user_id()
+  );
+
+-- DELETE: Admin only
+CREATE POLICY "Admin can delete sales bills"
+  ON bills_sales FOR DELETE
+  USING (get_user_role() = 'admin');
+
+-- ----------------------------------------
+-- PAYMENTS_SALES: Policies (admin only for write, same as payments)
+-- ----------------------------------------
+
+-- SELECT: Users see sales payments for their assigned projects, admins see all
+CREATE POLICY "View sales payments"
+  ON payments_sales FOR SELECT
+  USING (
+    get_user_role() = 'admin'
+    OR project_id IN (
+      SELECT project_id FROM user_projects
+      WHERE user_id = get_user_id()
+    )
+  );
+
+-- INSERT: Admin only
+CREATE POLICY "Admin can create sales payments"
+  ON payments_sales FOR INSERT
+  WITH CHECK (get_user_role() = 'admin');
+
+-- UPDATE: Admin only
+CREATE POLICY "Admin can update sales payments"
+  ON payments_sales FOR UPDATE
+  USING (get_user_role() = 'admin');
+
+-- DELETE: Admin only
+CREATE POLICY "Admin can delete sales payments"
+  ON payments_sales FOR DELETE
   USING (get_user_role() = 'admin');
 ```
 
