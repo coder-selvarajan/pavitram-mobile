@@ -291,8 +291,8 @@ export default function BillEditScreen() {
       >
         <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
           {/* Sub-header: Add/Edit Bill + status badge */}
-          <View className="bg-white px-3 py-3 flex-row items-center justify-between border-b border-gray-100 shadow-sm">
-            <Text className="text-gray-800 font-bold text-sm">
+          <View className="bg-white px-4 py-3.5 flex-row items-center justify-between border-b border-gray-100 shadow-sm">
+            <Text className="text-gray-800 font-bold text-lg">
               {isNew ? 'Add Bill' : 'Edit Bill'}
             </Text>
             <View className="flex-row items-center gap-2">
@@ -303,7 +303,7 @@ export default function BillEditScreen() {
                 >
                   <Text
                     style={{ color: STATUS_CONFIG[existingBill.status].textColor }}
-                    className="text-[10px] font-semibold"
+                    className="text-sm font-semibold"
                   >
                     {STATUS_CONFIG[existingBill.status].label}
                   </Text>
@@ -324,7 +324,7 @@ export default function BillEditScreen() {
           {saved && (
             <View className="mx-3 mt-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2 flex-row items-center gap-2">
               <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
-              <Text className="text-green-700 text-xs font-medium">Saved successfully</Text>
+              <Text className="text-green-700 text-base font-medium">Saved successfully</Text>
             </View>
           )}
 
@@ -335,7 +335,7 @@ export default function BillEditScreen() {
               {/* Project — read-only */}
               <FormRow label="Project">
                 <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                  <Text className="text-gray-600 text-xs">{project?.project_name ?? '—'}</Text>
+                  <Text className="text-gray-600 text-base">{project?.project_name ?? '—'}</Text>
                 </View>
               </FormRow>
 
@@ -343,11 +343,11 @@ export default function BillEditScreen() {
               <FormRow label="Vendor">
                 {vendorId ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{vendor?.vendor_name ?? '—'}</Text>
+                    <Text className="text-gray-600 text-base">{vendor?.vendor_name ?? '—'}</Text>
                   </View>
                 ) : isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{vendor?.vendor_name ?? '—'}</Text>
+                    <Text className="text-gray-600 text-base">{vendor?.vendor_name ?? '—'}</Text>
                   </View>
                 ) : (
                   <ModalPicker
@@ -368,14 +368,14 @@ export default function BillEditScreen() {
               <FormRow label="Date">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{formatDateDisplay(date)}</Text>
+                    <Text className="text-gray-600 text-base">{formatDateDisplay(date)}</Text>
                   </View>
                 ) : (
                   <TouchableOpacity
                     onPress={() => setShowDatePicker(true)}
                     className="border border-gray-200 rounded-lg px-2.5 py-2 flex-row items-center justify-between bg-white"
                   >
-                    <Text className="text-gray-800 text-xs">{formatDateDisplay(date)}</Text>
+                    <Text className="text-gray-800 text-base">{formatDateDisplay(date)}</Text>
                     <Ionicons name="calendar-outline" size={16} color="#9ca3af" />
                   </TouchableOpacity>
                 )}
@@ -393,7 +393,7 @@ export default function BillEditScreen() {
               <FormRow label="Bill #">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{billNumber || '—'}</Text>
+                    <Text className="text-gray-600 text-base">{billNumber || '—'}</Text>
                   </View>
                 ) : (
                   <TextInput
@@ -401,7 +401,7 @@ export default function BillEditScreen() {
                     onChangeText={setBillNumber}
                     placeholder="e.g. INV-2025-001"
                     placeholderTextColor="#9ca3af"
-                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-xs bg-white"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white"
                   />
                 )}
               </FormRow>
@@ -410,7 +410,7 @@ export default function BillEditScreen() {
               <FormRow label="Bill Amount">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{formatCurrency(amountNum)}</Text>
+                    <Text className="text-gray-600 text-base">{formatCurrency(amountNum)}</Text>
                   </View>
                 ) : (
                   <TextInput
@@ -419,7 +419,7 @@ export default function BillEditScreen() {
                     placeholder="0"
                     placeholderTextColor="#9ca3af"
                     keyboardType="numeric"
-                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-xs bg-white"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white"
                   />
                 )}
               </FormRow>
@@ -428,7 +428,7 @@ export default function BillEditScreen() {
               <FormRow label="Discount">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{formatCurrency(discountNum)}</Text>
+                    <Text className="text-gray-600 text-base">{formatCurrency(discountNum)}</Text>
                   </View>
                 ) : (
                   <TextInput
@@ -437,7 +437,7 @@ export default function BillEditScreen() {
                     placeholder="0"
                     placeholderTextColor="#9ca3af"
                     keyboardType="numeric"
-                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-xs bg-white"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white"
                   />
                 )}
               </FormRow>
@@ -445,11 +445,11 @@ export default function BillEditScreen() {
               {/* Net Amount — always read-only */}
               <FormRow label="Amount">
                 <View className="flex-row items-center gap-2 py-1">
-                  <Text className="text-primary-500 text-sm font-bold">
+                  <Text className="text-primary-500 text-lg font-bold">
                     {formatCurrency(netAmount)}
                   </Text>
                   {discountNum > 0 && (
-                    <Text className="text-gray-400 text-[10px]">
+                    <Text className="text-gray-400 text-sm">
                       ({formatCurrency(amountNum)} − {formatCurrency(discountNum)})
                     </Text>
                   )}
@@ -460,7 +460,7 @@ export default function BillEditScreen() {
               <FormRow label="Category">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{category || '—'}</Text>
+                    <Text className="text-gray-600 text-base">{category || '—'}</Text>
                   </View>
                 ) : (
                   <ModalPicker
@@ -479,7 +479,7 @@ export default function BillEditScreen() {
               <FormRow label="Sub Category">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{subCategory || '—'}</Text>
+                    <Text className="text-gray-600 text-base">{subCategory || '—'}</Text>
                   </View>
                 ) : (
                   <ModalPicker
@@ -495,7 +495,7 @@ export default function BillEditScreen() {
               <FormRow label="GST %">
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
-                    <Text className="text-gray-600 text-xs">{gst}% GST</Text>
+                    <Text className="text-gray-600 text-base">{gst}% GST</Text>
                   </View>
                 ) : (
                   <ModalPicker
@@ -511,7 +511,7 @@ export default function BillEditScreen() {
               <FormRow label="Description" last>
                 {isReadOnly ? (
                   <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 min-h-[60px]">
-                    <Text className="text-gray-600 text-xs">{description || '—'}</Text>
+                    <Text className="text-gray-600 text-base">{description || '—'}</Text>
                   </View>
                 ) : (
                   <TextInput
@@ -522,7 +522,7 @@ export default function BillEditScreen() {
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
-                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-xs bg-white min-h-[70px]"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white min-h-[70px]"
                   />
                 )}
               </FormRow>
@@ -533,49 +533,49 @@ export default function BillEditScreen() {
           {!isReadOnly && (
             <View className="px-3 pb-8">
               {/* Row 1: Cancel | Submit */}
-              <View className="flex-row gap-1.5 mb-1.5">
+              <View className="flex-row gap-2 mb-2">
                 <TouchableOpacity
                   onPress={() => router.back()}
-                  className="flex-1 py-3 rounded-lg bg-gray-200 items-center"
+                  className="flex-1 py-3.5 rounded-lg bg-gray-200 items-center"
                   activeOpacity={0.7}
                 >
-                  <Text className="text-gray-600 text-xs font-semibold">Cancel</Text>
+                  <Text className="text-gray-600 text-base font-semibold">Cancel</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => handleSave('submitted')}
                   disabled={saving || saved}
-                  className="flex-1 py-3 rounded-lg bg-orange-500 items-center"
+                  className="flex-1 py-3.5 rounded-lg bg-orange-500 items-center"
                   activeOpacity={0.7}
                   style={{ opacity: saving || saved ? 0.5 : 1 }}
                 >
                   {saving ? (
                     <ActivityIndicator size="small" color="#ffffff" />
                   ) : (
-                    <Text className="text-white text-xs font-semibold">Submit</Text>
+                    <Text className="text-white text-base font-semibold">Submit</Text>
                   )}
                 </TouchableOpacity>
               </View>
 
               {/* Row 2 (admin only): Approve | Payment Processed */}
               {isAdmin && (
-                <View className="flex-row gap-1.5">
+                <View className="flex-row gap-2">
                   <TouchableOpacity
                     onPress={() => handleSave('approved')}
                     disabled={saving || saved}
-                    className="flex-1 py-3 rounded-lg bg-cyan-500 items-center"
+                    className="flex-1 py-3.5 rounded-lg bg-cyan-500 items-center"
                     activeOpacity={0.7}
                     style={{ opacity: saving || saved ? 0.5 : 1 }}
                   >
-                    <Text className="text-white text-xs font-semibold">Approve</Text>
+                    <Text className="text-white text-base font-semibold">Approve</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => handleSave('payment_processed')}
                     disabled={saving || saved}
-                    className="flex-1 py-3 rounded-lg bg-sky-500 items-center"
+                    className="flex-1 py-3.5 rounded-lg bg-sky-500 items-center"
                     activeOpacity={0.7}
                     style={{ opacity: saving || saved ? 0.5 : 1 }}
                   >
-                    <Text className="text-white text-xs font-semibold">Payment Processed</Text>
+                    <Text className="text-white text-base font-semibold">Payment Processed</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -599,7 +599,7 @@ function FormRow({
 }) {
   return (
     <View className={`flex-row items-start gap-2 py-2.5 ${last ? '' : 'border-b border-gray-50'}`}>
-      <Text className="text-gray-500 text-xs font-semibold w-24 pt-1.5">{label}</Text>
+      <Text className="text-gray-500 text-base font-semibold w-24 pt-1.5">{label}</Text>
       <View className="flex-1">{children}</View>
     </View>
   );

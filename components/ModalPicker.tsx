@@ -44,17 +44,17 @@ export default function ModalPicker({
     <>
       <TouchableOpacity
         onPress={() => !disabled && setVisible(true)}
-        className="border border-gray-200 rounded-lg px-2.5 py-2.5 flex-row items-center justify-between bg-white"
+        className="border border-gray-200 rounded-lg px-3 py-3 flex-row items-center justify-between bg-white"
         activeOpacity={0.7}
         disabled={disabled}
       >
         <Text
-          className={`text-xs flex-1 ${hasSelection ? 'text-gray-800' : 'text-gray-400'}`}
+          className={`text-base flex-1 ${hasSelection ? 'text-gray-800' : 'text-gray-400'}`}
           numberOfLines={1}
         >
           {displayText}
         </Text>
-        <Ionicons name="chevron-down" size={14} color="#9ca3af" />
+        <Ionicons name="chevron-down" size={16} color="#9ca3af" />
       </TouchableOpacity>
 
       <Modal visible={visible} transparent animationType="slide">
@@ -65,10 +65,10 @@ export default function ModalPicker({
         />
         <SafeAreaView className="bg-white rounded-t-2xl max-h-[60%]">
           {/* Header */}
-          <View className="flex-row items-center justify-between px-4 py-3 border-b border-gray-100">
-            <Text className="text-sm font-semibold text-gray-800">Select</Text>
+          <View className="flex-row items-center justify-between px-4 py-3.5 border-b border-gray-100">
+            <Text className="text-lg font-semibold text-gray-800">Select</Text>
             <TouchableOpacity onPress={() => setVisible(false)}>
-              <Ionicons name="close" size={22} color="#6b7280" />
+              <Ionicons name="close" size={24} color="#6b7280" />
             </TouchableOpacity>
           </View>
 
@@ -81,13 +81,13 @@ export default function ModalPicker({
               return (
                 <TouchableOpacity
                   onPress={() => handleSelect(item.value)}
-                  className={`px-4 py-3 flex-row items-center justify-between border-b border-gray-50 ${
+                  className={`px-4 py-3.5 flex-row items-center justify-between border-b border-gray-50 ${
                     isSelected ? 'bg-primary-50' : ''
                   }`}
                   activeOpacity={0.6}
                 >
                   <Text
-                    className={`text-sm flex-1 ${
+                    className={`text-lg flex-1 ${
                       isSelected ? 'text-primary-600 font-semibold' : 'text-gray-700'
                     }`}
                     numberOfLines={1}

@@ -84,38 +84,38 @@ export default function ProjectListScreen() {
   const reportButton = isAdmin ? (
     <TouchableOpacity
       onPress={() => router.push('/(auth)/report')}
-      className="flex-row items-center gap-1 bg-white/20 px-2.5 py-1.5 rounded-full"
+      className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
       activeOpacity={0.7}
     >
-      <Ionicons name="bar-chart-outline" size={14} color="#ffffff" />
-      <Text className="text-white text-xs font-medium">Report</Text>
+      <Ionicons name="bar-chart-outline" size={16} color="#ffffff" />
+      <Text className="text-white text-base font-medium">Report</Text>
     </TouchableOpacity>
   ) : null;
 
   const renderProject = ({ item, index }: { item: ProjectWithOutstanding; index: number }) => (
     <TouchableOpacity
       onPress={() => router.push(`/(auth)/vendors?projectId=${item.id}`)}
-      className="bg-white rounded-xl shadow-sm border border-gray-100 mx-3 mb-2 px-3 py-2.5 flex-row items-center gap-2.5"
+      className="bg-white rounded-xl shadow-sm border border-gray-100 mx-3 mb-2 px-4 py-3 flex-row items-center gap-3"
       activeOpacity={0.7}
     >
       {/* Index badge */}
       <View className="w-8 h-8 rounded-full bg-primary-50 items-center justify-center">
-        <Text className="text-primary-500 text-xs font-bold">{index + 1}</Text>
+        <Text className="text-primary-500 text-base font-bold">{index + 1}</Text>
       </View>
 
       {/* Project info */}
       <View className="flex-1 min-w-0">
-        <Text className="text-gray-800 font-semibold text-sm leading-snug" numberOfLines={1}>
+        <Text className="text-gray-800 font-semibold text-lg leading-snug" numberOfLines={1}>
           {item.project_name}
         </Text>
-        <Text className="text-gray-400 text-xs mt-0.5">
+        <Text className="text-gray-400 text-base mt-0.5">
           {item.outstanding > 0 ? 'Outstanding dues' : 'No outstanding'}
         </Text>
       </View>
 
       {/* Amount */}
       <Text
-        className={`text-sm font-bold ${item.outstanding > 0 ? 'text-primary-500' : 'text-green-500'}`}
+        className={`text-lg font-bold ${item.outstanding > 0 ? 'text-primary-500' : 'text-green-500'}`}
       >
         {fmt(item.outstanding)}
       </Text>
@@ -141,10 +141,10 @@ export default function ProjectListScreen() {
       <AppHeader title="Projects" rightContent={reportButton} />
 
       {/* Summary Banner */}
-      <View className="bg-primary-500 px-3 pb-2 pt-2">
-        <View className="bg-white/15 rounded-lg px-3 py-1.5 flex-row items-center justify-between">
-          <Text className="text-white/70 text-xs">Total Outstanding</Text>
-          <Text className="text-white text-base font-bold tracking-tight">
+      <View className="bg-primary-500 px-4 pb-3 pt-3">
+        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
+          <Text className="text-white/70 text-base">Total Outstanding</Text>
+          <Text className="text-white text-xl font-bold tracking-tight">
             {fmt(totalOutstanding)}
           </Text>
         </View>
@@ -162,7 +162,7 @@ export default function ProjectListScreen() {
         ListEmptyComponent={
           <View className="items-center justify-center py-16">
             <Ionicons name="home-outline" size={48} color="#d1d5db" />
-            <Text className="text-sm text-gray-400 mt-2">No projects assigned</Text>
+            <Text className="text-lg text-gray-400 mt-2">No projects assigned</Text>
           </View>
         }
       />

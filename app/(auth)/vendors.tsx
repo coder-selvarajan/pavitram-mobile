@@ -124,32 +124,32 @@ export default function VendorListScreen() {
   );
 
   const renderVendor = ({ item }: { item: VendorWithSummary }) => (
-    <View className="bg-white rounded-xl shadow-sm border border-gray-100 mx-3 mb-2 px-3 py-2.5">
+    <View className="bg-white rounded-xl shadow-sm border border-gray-100 mx-3 mb-2 px-4 py-3">
       {/* Vendor name + action icons */}
       <View className="flex-row items-center justify-between mb-2">
-        <Text className="text-gray-800 font-semibold text-sm flex-1 pr-2" numberOfLines={1}>
+        <Text className="text-gray-800 font-semibold text-lg flex-1 pr-2" numberOfLines={1}>
           {item.vendor_name}
         </Text>
-        <View className="flex-row items-center gap-1.5">
+        <View className="flex-row items-center gap-2">
           <TouchableOpacity
             onPress={() =>
               router.push(`/(auth)/vendor-statement?projectId=${projectId}&vendorId=${item.id}`)
             }
-            className="p-1.5 rounded-lg bg-blue-50"
+            className="p-2 rounded-lg bg-blue-50"
             activeOpacity={0.7}
             accessibilityLabel="Vendor Statement"
           >
-            <Ionicons name="clipboard-outline" size={20} color="#3b82f6" />
+            <Ionicons name="clipboard-outline" size={22} color="#3b82f6" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() =>
               router.push(`/(auth)/vendor-pending?projectId=${projectId}&vendorId=${item.id}`)
             }
-            className="p-1.5 rounded-lg bg-amber-50"
+            className="p-2 rounded-lg bg-amber-50"
             activeOpacity={0.7}
             accessibilityLabel="Pending Approval"
           >
-            <Ionicons name="time-outline" size={20} color="#f59e0b" />
+            <Ionicons name="time-outline" size={22} color="#f59e0b" />
           </TouchableOpacity>
         </View>
       </View>
@@ -160,21 +160,21 @@ export default function VendorListScreen() {
       {/* Paid / Outstanding / Pending */}
       <View className="flex-row">
         <View className="flex-1">
-          <Text className="text-gray-400 text-xs mb-0.5">Paid</Text>
-          <Text className="text-green-600 text-sm font-semibold">{fmt(item.paid)}</Text>
+          <Text className="text-gray-400 text-base mb-0.5">Paid</Text>
+          <Text className="text-green-600 text-lg font-semibold">{fmt(item.paid)}</Text>
         </View>
         <View className="flex-1 items-center">
-          <Text className="text-gray-400 text-xs mb-0.5">Outstanding</Text>
+          <Text className="text-gray-400 text-base mb-0.5">Outstanding</Text>
           <Text
-            className={`text-sm font-semibold ${item.outstanding > 0 ? 'text-primary-500' : 'text-gray-400'}`}
+            className={`text-lg font-semibold ${item.outstanding > 0 ? 'text-primary-500' : 'text-gray-400'}`}
           >
             {fmt(item.outstanding)}
           </Text>
         </View>
         <View className="flex-1 items-end">
-          <Text className="text-gray-400 text-xs mb-0.5">Pending Apvl</Text>
+          <Text className="text-gray-400 text-base mb-0.5">Pending Apvl</Text>
           <Text
-            className={`text-sm font-semibold ${item.pendingApproval > 0 ? 'text-amber-500' : 'text-gray-400'}`}
+            className={`text-lg font-semibold ${item.pendingApproval > 0 ? 'text-amber-500' : 'text-gray-400'}`}
           >
             {fmt(item.pendingApproval)}
           </Text>
@@ -199,19 +199,19 @@ export default function VendorListScreen() {
       <AppHeader title={project?.project_name ?? 'Vendors'} showBack />
 
       {/* Summary Banner */}
-      <View className="bg-primary-500 px-3 pb-2 pt-2">
-        <View className="bg-white/15 rounded-lg px-3 py-1.5 flex-row">
+      <View className="bg-primary-500 px-4 pb-3 pt-3">
+        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row">
           <View className="flex-1">
-            <Text className="text-white/70 text-[10px]">Paid</Text>
-            <Text className="text-white text-sm font-bold">{fmt(totals.paid)}</Text>
+            <Text className="text-white/70 text-sm">Paid</Text>
+            <Text className="text-white text-lg font-bold">{fmt(totals.paid)}</Text>
           </View>
           <View className="flex-1 items-center">
-            <Text className="text-white/70 text-[10px]">Outstanding</Text>
-            <Text className="text-white text-sm font-bold">{fmt(totals.outstanding)}</Text>
+            <Text className="text-white/70 text-sm">Outstanding</Text>
+            <Text className="text-white text-lg font-bold">{fmt(totals.outstanding)}</Text>
           </View>
           <View className="flex-1 items-end">
-            <Text className="text-white/70 text-[10px]">Pending</Text>
-            <Text className="text-white text-sm font-bold">{fmt(totals.pendingApproval)}</Text>
+            <Text className="text-white/70 text-sm">Pending</Text>
+            <Text className="text-white text-lg font-bold">{fmt(totals.pendingApproval)}</Text>
           </View>
         </View>
 
@@ -221,22 +221,22 @@ export default function VendorListScreen() {
             onPress={() =>
               router.push(`/(auth)/bill-edit?projectId=${projectId}&billId=new`)
             }
-            className="flex-row items-center gap-1 bg-white/20 px-2.5 py-1.5 rounded-full"
+            className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
             activeOpacity={0.7}
           >
-            <Ionicons name="receipt-outline" size={13} color="#ffffff" />
-            <Text className="text-white text-xs font-medium">Add Bill</Text>
+            <Ionicons name="receipt-outline" size={16} color="#ffffff" />
+            <Text className="text-white text-base font-medium">Add Bill</Text>
           </TouchableOpacity>
           {isAdmin && (
             <TouchableOpacity
               onPress={() =>
                 router.push(`/(auth)/payment-edit?projectId=${projectId}&paymentId=new`)
               }
-              className="flex-row items-center gap-1 bg-white/20 px-2.5 py-1.5 rounded-full"
+              className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
               activeOpacity={0.7}
             >
-              <Ionicons name="card-outline" size={13} color="#ffffff" />
-              <Text className="text-white text-xs font-medium">Add Payment</Text>
+              <Ionicons name="card-outline" size={16} color="#ffffff" />
+              <Text className="text-white text-base font-medium">Add Payment</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -259,7 +259,7 @@ export default function VendorListScreen() {
         ListEmptyComponent={
           <View className="items-center justify-center py-16">
             <Ionicons name="people-outline" size={48} color="#d1d5db" />
-            <Text className="text-sm text-gray-400 mt-2">No vendors found for this project</Text>
+            <Text className="text-lg text-gray-400 mt-2">No vendors found for this project</Text>
           </View>
         }
       />

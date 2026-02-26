@@ -131,24 +131,24 @@ export default function VendorStatementScreen() {
   const headerRight = useMemo(
     () =>
       isAdmin ? (
-        <View className="flex-row items-center gap-1">
+        <View className="flex-row items-center gap-1.5">
           <TouchableOpacity
             onPress={() =>
               router.push(
                 `/(auth)/payment-edit?projectId=${projectId}&vendorId=${vendorId}&paymentId=new`,
               )
             }
-            className="flex-row items-center gap-1 bg-white/20 px-2.5 py-1.5 rounded-full"
+            className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
             activeOpacity={0.7}
           >
-            <Ionicons name="add" size={14} color="#ffffff" />
-            <Text className="text-white text-xs font-medium">Payment</Text>
+            <Ionicons name="add" size={16} color="#ffffff" />
+            <Text className="text-white text-base font-medium">Payment</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="p-1.5 rounded-full bg-white/20"
+            className="p-2 rounded-full bg-white/20"
             activeOpacity={0.7}
           >
-            <Ionicons name="download-outline" size={18} color="#ffffff" />
+            <Ionicons name="download-outline" size={20} color="#ffffff" />
           </TouchableOpacity>
         </View>
       ) : null,
@@ -213,28 +213,28 @@ export default function VendorStatementScreen() {
       />
 
       {/* Vendor name + summary */}
-      <View className="bg-primary-500 px-3 pb-3 pt-2">
-        <Text className="text-white font-bold text-sm mb-2" numberOfLines={1}>
+      <View className="bg-primary-500 px-4 pb-4 pt-3">
+        <Text className="text-white font-bold text-lg mb-2" numberOfLines={1}>
           {vendor?.vendor_name}
         </Text>
 
         {/* Summary card */}
-        <View className="bg-white/15 rounded-lg px-3 py-1.5 flex-row">
+        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row">
           <View className="flex-1">
-            <Text className="text-white/70 text-[10px]">Paid</Text>
-            <Text className="text-white text-sm font-bold">
+            <Text className="text-white/70 text-sm">Paid</Text>
+            <Text className="text-white text-lg font-bold">
               {formatCurrency(summary.paid)}
             </Text>
           </View>
           <View className="flex-1 items-center">
-            <Text className="text-white/70 text-[10px]">Outstanding</Text>
-            <Text className="text-white text-sm font-bold">
+            <Text className="text-white/70 text-sm">Outstanding</Text>
+            <Text className="text-white text-lg font-bold">
               {formatCurrency(summary.outstanding)}
             </Text>
           </View>
           <View className="flex-1 items-end">
-            <Text className="text-white/70 text-[10px]">Pending</Text>
-            <Text className="text-white text-sm font-bold">
+            <Text className="text-white/70 text-sm">Pending</Text>
+            <Text className="text-white text-lg font-bold">
               {formatCurrency(summary.pendingApproval)}
             </Text>
           </View>
@@ -242,21 +242,21 @@ export default function VendorStatementScreen() {
       </View>
 
       {/* Toolbar */}
-      <View className="flex-row items-center justify-between px-3 py-2.5 bg-white border-b border-gray-100">
+      <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
         {/* Sort toggle */}
         <TouchableOpacity
           onPress={() =>
             setSortOrder((s) => (s === 'desc' ? 'asc' : 'desc'))
           }
-          className="flex-row items-center gap-1 px-2.5 py-1.5 rounded-full bg-gray-100"
+          className="flex-row items-center gap-1.5 px-3 py-2 rounded-full bg-gray-100"
           activeOpacity={0.7}
         >
           <Ionicons
             name={sortOrder === 'desc' ? 'arrow-down' : 'arrow-up'}
-            size={12}
+            size={14}
             color="#4b5563"
           />
-          <Text className="text-gray-600 text-xs font-medium">
+          <Text className="text-gray-600 text-base font-medium">
             {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
           </Text>
         </TouchableOpacity>
@@ -268,7 +268,7 @@ export default function VendorStatementScreen() {
               <TouchableOpacity
                 key={f}
                 onPress={() => setFilter(f)}
-                className={`px-2.5 py-1 rounded-full ${
+                className={`px-3 py-1.5 rounded-full ${
                   filter === f ? 'bg-primary-500' : ''
                 }`}
                 style={
@@ -279,7 +279,7 @@ export default function VendorStatementScreen() {
                 activeOpacity={0.7}
               >
                 <Text
-                  className={`text-xs font-medium ${
+                  className={`text-base font-medium ${
                     filter === f ? 'text-white' : 'text-gray-500'
                   }`}
                 >
@@ -292,14 +292,14 @@ export default function VendorStatementScreen() {
           {/* Compact/Expanded toggle */}
           <TouchableOpacity
             onPress={() => setIsCompact((c) => !c)}
-            className={`p-1.5 rounded-full ${
+            className={`p-2 rounded-full ${
               isCompact ? 'bg-primary-100' : 'bg-gray-100'
             }`}
             activeOpacity={0.7}
           >
             <Ionicons
               name={isCompact ? 'list' : 'reorder-three'}
-              size={16}
+              size={18}
               color={isCompact ? '#ff4500' : '#6b7280'}
             />
           </TouchableOpacity>
@@ -328,7 +328,7 @@ export default function VendorStatementScreen() {
         ListEmptyComponent={
           <View className="items-center justify-center py-16">
             <Ionicons name="document-text-outline" size={48} color="#d1d5db" />
-            <Text className="text-sm text-gray-400 mt-2">
+            <Text className="text-lg text-gray-400 mt-2">
               No transactions found
             </Text>
           </View>

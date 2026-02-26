@@ -24,7 +24,7 @@ export default function CompactRow({ item, onPress }: CompactRowProps) {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.7}
-      className="bg-white rounded-lg shadow-sm border border-gray-100 px-3 py-1.5 flex-row items-center gap-2"
+      className="bg-white rounded-lg shadow-sm border border-gray-100 px-4 py-2.5 flex-row items-center gap-2.5"
     >
       {/* Accent bar */}
       <View
@@ -35,30 +35,30 @@ export default function CompactRow({ item, onPress }: CompactRowProps) {
       <View className="flex-1 min-w-0">
         <View className="flex-row items-center gap-1.5">
           <Text
-            className={`text-[10px] font-bold uppercase tracking-wide ${
+            className={`text-sm font-bold uppercase tracking-wide ${
               isBill ? 'text-primary-500' : 'text-green-600'
             }`}
           >
             {isBill ? 'Bill' : 'Payment'}
           </Text>
           {isBill ? (
-            <Text className="text-gray-500 text-xs font-medium" numberOfLines={1}>
+            <Text className="text-gray-500 text-base font-medium" numberOfLines={1}>
               #{(item.data as Bill).bill_number || '—'}
             </Text>
           ) : (
-            <Text className="text-gray-500 text-xs" numberOfLines={1}>
+            <Text className="text-gray-500 text-base" numberOfLines={1}>
               {(item as { type: 'payment'; methodName: string }).methodName}
             </Text>
           )}
           {badge && (
             <View className={`px-1.5 py-0.5 rounded-full ${badge.bg}`}>
-              <Text className={`text-[10px] font-medium ${badge.text}`}>
+              <Text className={`text-sm font-medium ${badge.text}`}>
                 {badge.label}
               </Text>
             </View>
           )}
         </View>
-        <Text className="text-gray-400 text-xs" numberOfLines={1}>
+        <Text className="text-gray-400 text-base" numberOfLines={1}>
           {formatDate(item.data.date)}
           {isBill && (item.data as Bill).category
             ? ` · ${(item.data as Bill).category}`
@@ -71,7 +71,7 @@ export default function CompactRow({ item, onPress }: CompactRowProps) {
 
       {/* Amount */}
       <Text
-        className={`text-sm font-bold flex-shrink-0 ${
+        className={`text-lg font-bold flex-shrink-0 ${
           isBill ? 'text-gray-900' : 'text-green-600'
         }`}
       >

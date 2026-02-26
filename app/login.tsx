@@ -79,13 +79,13 @@ export default function LoginScreen() {
         {/* Login Form */}
         <View className="flex-1 px-6 pt-6 pb-4">
           <Text className="text-2xl font-bold text-gray-800">Welcome back</Text>
-          <Text className="text-sm text-gray-500 mt-1 mb-6">Sign in to continue</Text>
+          <Text className="text-lg text-gray-500 mt-1 mb-6">Sign in to continue</Text>
 
           {/* Username */}
-          <Text className="text-xs font-medium text-gray-700 mb-1">Username</Text>
+          <Text className="text-base font-medium text-gray-700 mb-1">Username</Text>
           <View className="flex-row items-center border border-gray-300 rounded-xl bg-primary-50/50 mb-4">
             <TextInput
-              className="flex-1 px-4 py-3 text-sm text-gray-800"
+              className="flex-1 px-4 py-3 text-lg text-gray-800"
               placeholder="Enter username"
               placeholderTextColor="#9ca3af"
               value={username}
@@ -94,13 +94,13 @@ export default function LoginScreen() {
               autoCorrect={false}
               editable={!loading}
             />
-            <Text className="text-sm text-gray-400 pr-4">@pavitram.app</Text>
+            <Text className="text-lg text-gray-400 pr-4">@pavitram.app</Text>
           </View>
 
           {/* Password */}
-          <Text className="text-xs font-medium text-gray-700 mb-1">Password</Text>
+          <Text className="text-base font-medium text-gray-700 mb-1">Password</Text>
           <TextInput
-            className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-800 bg-primary-50/50 mb-4"
+            className="border border-gray-300 rounded-xl px-4 py-3 text-lg text-gray-800 bg-primary-50/50 mb-4"
             placeholder="Enter password"
             placeholderTextColor="#9ca3af"
             value={password}
@@ -113,12 +113,12 @@ export default function LoginScreen() {
 
           {/* Error Message */}
           {error ? (
-            <Text className="text-xs text-red-500 text-center mb-2">{error}</Text>
+            <Text className="text-base text-red-500 text-center mb-2">{error}</Text>
           ) : null}
 
           {/* Sign In Button */}
           <TouchableOpacity
-            className={`rounded-full py-3.5 mt-2 ${loading ? 'bg-primary-300' : 'bg-primary-500'}`}
+            className={`rounded-full py-4 mt-2 ${loading ? 'bg-primary-300' : 'bg-primary-500'}`}
             onPress={handleLogin}
             disabled={loading}
             activeOpacity={0.8}
@@ -126,7 +126,7 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color="#ffffff" />
             ) : (
-              <Text className="text-white text-center font-semibold text-base">Sign In</Text>
+              <Text className="text-white text-center font-semibold text-xl">Sign In</Text>
             )}
           </TouchableOpacity>
 
@@ -135,7 +135,7 @@ export default function LoginScreen() {
             {/* Divider with label */}
             <View className="flex-row items-center mb-3">
               <View className="flex-1 h-px bg-gray-200" />
-              <Text className="text-[10px] text-gray-400 font-medium px-2">Demo Credentials</Text>
+              <Text className="text-sm text-gray-400 font-medium px-2">Demo Credentials</Text>
               <View className="flex-1 h-px bg-gray-200" />
             </View>
 
@@ -156,20 +156,20 @@ export default function LoginScreen() {
                     }`}
                   >
                     <Text
-                      className={`text-[10px] font-semibold ${
+                      className={`text-sm font-semibold ${
                         cred.isAdmin ? 'text-primary-600' : 'text-blue-600'
                       }`}
                     >
                       {cred.role}
                     </Text>
                   </View>
-                  <Text className="text-xs font-semibold text-gray-800">{cred.username}</Text>
-                  <Text className="text-[10px] text-gray-400 mt-0.5">{cred.password}</Text>
+                  <Text className="text-base font-semibold text-gray-800">{cred.username}</Text>
+                  <Text className="text-sm text-gray-400 mt-0.5">{cred.password}</Text>
                 </TouchableOpacity>
               ))}
             </View>
 
-            <Text className="text-center text-[10px] text-gray-400 mt-2">
+            <Text className="text-center text-sm text-gray-400 mt-2">
               Tap to fill credentials
             </Text>
           </View>
