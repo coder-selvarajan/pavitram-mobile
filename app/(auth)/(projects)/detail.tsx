@@ -154,24 +154,6 @@ export default function ProjectDetailScreen() {
     <View className="flex-1 bg-gray-50">
       <AppHeader title={project?.project_name ?? 'Project Detail'} showBack />
 
-      {/* Summary Banner */}
-      <View className="bg-primary-500 px-4 pb-3 pt-3">
-        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row">
-          <View className="flex-1">
-            <Text className="text-white/70 text-sm">Purchase</Text>
-            <Text className="text-white text-lg font-bold">{formatCurrency(totals.purchaseOutstanding)}</Text>
-          </View>
-          <View className="flex-1 items-center">
-            <Text className="text-white/70 text-sm">Sales</Text>
-            <Text className="text-white text-lg font-bold">{formatCurrency(totals.salesOutstanding)}</Text>
-          </View>
-          <View className="flex-1 items-end">
-            <Text className="text-white/70 text-sm">Net</Text>
-            <Text className="text-white text-lg font-bold">{formatCurrency(totals.net)}</Text>
-          </View>
-        </View>
-      </View>
-
       {/* Combined transaction list */}
       <SectionList
         sections={sections}
@@ -179,6 +161,24 @@ export default function ProjectDetailScreen() {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 16 }}
+        ListHeaderComponent={
+          <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-1">
+            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
+              <View className="flex-1">
+                <Text className="text-gray-500 text-sm">Purchase</Text>
+                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.purchaseOutstanding)}</Text>
+              </View>
+              <View className="flex-1 items-center">
+                <Text className="text-gray-500 text-sm">Sales</Text>
+                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.salesOutstanding)}</Text>
+              </View>
+              <View className="flex-1 items-end">
+                <Text className="text-gray-500 text-sm">Net</Text>
+                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.net)}</Text>
+              </View>
+            </View>
+          </View>
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#ff4500']} tintColor="#ff4500" />
         }

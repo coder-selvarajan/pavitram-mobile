@@ -193,36 +193,6 @@ export default function CustomerPendingScreen() {
     <View className="flex-1 bg-gray-50">
       <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack />
 
-      <View className="bg-primary-500 px-4 pb-3.5 pt-3">
-        <View className="flex-row items-center justify-between mb-2">
-          <View className="flex-1 min-w-0 pr-2">
-            <Text className="text-white font-bold text-lg" numberOfLines={1}>
-              {customer?.customer_name}
-            </Text>
-            <Text className="text-white/70 text-sm mt-0.5">Pending Approval</Text>
-          </View>
-          <TouchableOpacity
-            onPress={() =>
-              router.push(
-                `/(auth)/(sales)/bill-edit?projectId=${projectId}&customerId=${customerId}&billId=new`,
-              )
-            }
-            className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full flex-shrink-0"
-            activeOpacity={0.7}
-          >
-            <Ionicons name="add" size={16} color="#ffffff" />
-            <Text className="text-white text-base font-medium">Add Bill</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
-          <Text className="text-white/70 text-sm">Total Pending Approval</Text>
-          <Text className="text-white text-lg font-bold">
-            {formatCurrency(totalPending)}
-          </Text>
-        </View>
-      </View>
-
       <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
         <TouchableOpacity
           onPress={() => setSortOrder((s) => (s === 'desc' ? 'asc' : 'desc'))}
@@ -262,6 +232,37 @@ export default function CustomerPendingScreen() {
           paddingBottom: 16,
           gap: isCompact ? 4 : 8,
         }}
+        ListHeaderComponent={
+          <View className="bg-white border-b border-gray-200 -mx-3 px-4 pb-3.5 pt-3 mb-2">
+            <View className="flex-row items-center justify-between mb-2">
+              <View className="flex-1 min-w-0 pr-2">
+                <Text className="text-gray-800 font-bold text-lg" numberOfLines={1}>
+                  {customer?.customer_name}
+                </Text>
+                <Text className="text-gray-500 text-sm mt-0.5">Pending Approval</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() =>
+                  router.push(
+                    `/(auth)/(sales)/bill-edit?projectId=${projectId}&customerId=${customerId}&billId=new`,
+                  )
+                }
+                className="flex-row items-center gap-1.5 bg-primary-500 px-3.5 py-2 rounded-full flex-shrink-0"
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add" size={16} color="#ffffff" />
+                <Text className="text-white text-base font-medium">Add Bill</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
+              <Text className="text-gray-500 text-sm">Total Pending Approval</Text>
+              <Text className="text-gray-800 text-lg font-bold">
+                {formatCurrency(totalPending)}
+              </Text>
+            </View>
+          </View>
+        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

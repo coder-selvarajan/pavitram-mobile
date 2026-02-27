@@ -194,56 +194,56 @@ export default function VendorListScreen() {
     <View className="flex-1 bg-gray-50">
       <AppHeader title={project?.project_name ?? 'Vendors'} showBack />
 
-      {/* Summary Banner */}
-      <View className="bg-primary-500 px-4 pb-3 pt-3">
-        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row">
-          <View className="flex-1">
-            <Text className="text-white/70 text-sm">Paid</Text>
-            <Text className="text-white text-lg font-bold">{fmt(totals.paid)}</Text>
-          </View>
-          <View className="flex-1 items-center">
-            <Text className="text-white/70 text-sm">Outstanding</Text>
-            <Text className="text-white text-lg font-bold">{fmt(totals.outstanding)}</Text>
-          </View>
-          <View className="flex-1 items-end">
-            <Text className="text-white/70 text-sm">Pending</Text>
-            <Text className="text-white text-lg font-bold">{fmt(totals.pendingApproval)}</Text>
-          </View>
-        </View>
-
-        {/* Add Bill / Add Payment quick action buttons */}
-        <View className="flex-row gap-2 mt-2">
-          <TouchableOpacity
-            onPress={() =>
-              router.push(`/(auth)/(purchase)/bill-edit?projectId=${projectId}&billId=new`)
-            }
-            className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
-            activeOpacity={0.7}
-          >
-            <Ionicons name="receipt-outline" size={16} color="#ffffff" />
-            <Text className="text-white text-base font-medium">Add Bill</Text>
-          </TouchableOpacity>
-          {isAdmin && (
-            <TouchableOpacity
-              onPress={() =>
-                router.push(`/(auth)/(purchase)/payment-edit?projectId=${projectId}&paymentId=new`)
-              }
-              className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
-              activeOpacity={0.7}
-            >
-              <Ionicons name="card-outline" size={16} color="#ffffff" />
-              <Text className="text-white text-base font-medium">Add Payment</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-
       {/* Vendor List */}
       <FlatList
         data={sortedVendors}
         keyExtractor={(item) => item.id}
         renderItem={renderVendor}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
+        ListHeaderComponent={
+          <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-2">
+            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
+              <View className="flex-1">
+                <Text className="text-gray-500 text-sm">Paid</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.paid)}</Text>
+              </View>
+              <View className="flex-1 items-center">
+                <Text className="text-gray-500 text-sm">Outstanding</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.outstanding)}</Text>
+              </View>
+              <View className="flex-1 items-end">
+                <Text className="text-gray-500 text-sm">Pending</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.pendingApproval)}</Text>
+              </View>
+            </View>
+
+            {/* Add Bill / Add Payment quick action buttons */}
+            <View className="flex-row gap-2 mt-2">
+              <TouchableOpacity
+                onPress={() =>
+                  router.push(`/(auth)/(purchase)/bill-edit?projectId=${projectId}&billId=new`)
+                }
+                className="flex-row items-center gap-1.5 bg-primary-500 px-3.5 py-2 rounded-full"
+                activeOpacity={0.7}
+              >
+                <Ionicons name="receipt-outline" size={16} color="#ffffff" />
+                <Text className="text-white text-base font-medium">Add Bill</Text>
+              </TouchableOpacity>
+              {isAdmin && (
+                <TouchableOpacity
+                  onPress={() =>
+                    router.push(`/(auth)/(purchase)/payment-edit?projectId=${projectId}&paymentId=new`)
+                  }
+                  className="flex-row items-center gap-1.5 bg-primary-500 px-3.5 py-2 rounded-full"
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="card-outline" size={16} color="#ffffff" />
+                  <Text className="text-white text-base font-medium">Add Payment</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

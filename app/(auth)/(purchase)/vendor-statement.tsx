@@ -135,17 +135,17 @@ export default function VendorStatementScreen() {
                 `/(auth)/(purchase)/payment-edit?projectId=${projectId}&vendorId=${vendorId}&paymentId=new`,
               )
             }
-            className="flex-row items-center gap-1.5 bg-white/20 px-3.5 py-2 rounded-full"
+            className="flex-row items-center gap-1.5 bg-primary-500 px-3.5 py-2 rounded-full"
             activeOpacity={0.7}
           >
             <Ionicons name="add" size={16} color="#ffffff" />
             <Text className="text-white text-base font-medium">Payment</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            className="p-2 rounded-full bg-white/20"
+            className="p-2 rounded-full bg-gray-100"
             activeOpacity={0.7}
           >
-            <Ionicons name="download-outline" size={20} color="#ffffff" />
+            <Ionicons name="download-outline" size={20} color="#6b7280" />
           </TouchableOpacity>
         </View>
       ) : null,
@@ -208,33 +208,6 @@ export default function VendorStatementScreen() {
         showBack
         rightContent={headerRight}
       />
-
-      <View className="bg-primary-500 px-4 pb-4 pt-3">
-        <Text className="text-white font-bold text-lg mb-2" numberOfLines={1}>
-          {vendor?.vendor_name}
-        </Text>
-
-        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row">
-          <View className="flex-1">
-            <Text className="text-white/70 text-sm">Paid</Text>
-            <Text className="text-white text-lg font-bold">
-              {formatCurrency(summary.paid)}
-            </Text>
-          </View>
-          <View className="flex-1 items-center">
-            <Text className="text-white/70 text-sm">Outstanding</Text>
-            <Text className="text-white text-lg font-bold">
-              {formatCurrency(summary.outstanding)}
-            </Text>
-          </View>
-          <View className="flex-1 items-end">
-            <Text className="text-white/70 text-sm">Pending</Text>
-            <Text className="text-white text-lg font-bold">
-              {formatCurrency(summary.pendingApproval)}
-            </Text>
-          </View>
-        </View>
-      </View>
 
       <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
         <TouchableOpacity
@@ -307,6 +280,33 @@ export default function VendorStatementScreen() {
           paddingBottom: 16,
           gap: isCompact ? 4 : 8,
         }}
+        ListHeaderComponent={
+          <View className="bg-white border-b border-gray-200 -mx-3 px-4 pb-3 pt-3 mb-2">
+            <Text className="text-gray-800 font-bold text-lg mb-2" numberOfLines={1}>
+              {vendor?.vendor_name}
+            </Text>
+            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
+              <View className="flex-1">
+                <Text className="text-gray-500 text-sm">Paid</Text>
+                <Text className="text-gray-800 text-lg font-bold">
+                  {formatCurrency(summary.paid)}
+                </Text>
+              </View>
+              <View className="flex-1 items-center">
+                <Text className="text-gray-500 text-sm">Outstanding</Text>
+                <Text className="text-gray-800 text-lg font-bold">
+                  {formatCurrency(summary.outstanding)}
+                </Text>
+              </View>
+              <View className="flex-1 items-end">
+                <Text className="text-gray-500 text-sm">Pending</Text>
+                <Text className="text-gray-800 text-lg font-bold">
+                  {formatCurrency(summary.pendingApproval)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        }
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

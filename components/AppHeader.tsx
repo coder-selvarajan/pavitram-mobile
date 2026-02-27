@@ -27,7 +27,7 @@ export default function AppHeader({ title, showBack = false, onBack, rightConten
 
   return (
     <View
-      className="bg-primary-500 shadow-md z-10"
+      className="bg-white border-b border-gray-200 z-10"
       style={{ paddingTop: insets.top }}
     >
       <View className="flex-row items-center px-4 py-3 gap-2">
@@ -35,14 +35,14 @@ export default function AppHeader({ title, showBack = false, onBack, rightConten
         {showBack && (
           <TouchableOpacity
             onPress={handleBack}
-            className="p-1 -ml-0.5 rounded-full active:bg-primary-600"
+            className="p-1 -ml-0.5 rounded-full active:bg-gray-100"
             accessibilityLabel="Go back"
           >
-            <Ionicons name="chevron-back" size={26} color="#ffffff" />
+            <Ionicons name="chevron-back" size={26} color="#ff4500" />
           </TouchableOpacity>
         )}
 
-        <Text className="flex-1 text-xl font-semibold text-white tracking-wide" numberOfLines={1}>
+        <Text className="flex-1 text-xl font-semibold text-primary-500 tracking-wide" numberOfLines={1}>
           {title}
         </Text>
 
@@ -51,10 +51,10 @@ export default function AppHeader({ title, showBack = false, onBack, rightConten
 
         <TouchableOpacity
           onPress={handleLogout}
-          className="p-1.5 rounded-full active:bg-primary-600"
+          className="p-1.5 rounded-full active:bg-gray-100"
           accessibilityLabel="Sign out"
         >
-          <Ionicons name="log-out-outline" size={26} color="#ffffff" />
+          <Ionicons name="log-out-outline" size={26} color="#6b7280" />
         </TouchableOpacity>
       </View>
     </View>

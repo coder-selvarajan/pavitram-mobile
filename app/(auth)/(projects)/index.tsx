@@ -157,30 +157,30 @@ export default function ProjectsCombinedScreen() {
     <View className="flex-1 bg-gray-50">
       <AppHeader title="Projects" />
 
-      {/* Summary Banner */}
-      <View className="bg-primary-500 px-4 pb-3 pt-3">
-        <View className="bg-white/15 rounded-lg px-4 py-2.5 flex-row">
-          <View className="flex-1">
-            <Text className="text-white/70 text-sm">Purchase</Text>
-            <Text className="text-white text-lg font-bold">{fmt(totals.purchase)}</Text>
-          </View>
-          <View className="flex-1 items-center">
-            <Text className="text-white/70 text-sm">Sales</Text>
-            <Text className="text-white text-lg font-bold">{fmt(totals.sales)}</Text>
-          </View>
-          <View className="flex-1 items-end">
-            <Text className="text-white/70 text-sm">Net</Text>
-            <Text className="text-white text-lg font-bold">{fmt(totals.combined)}</Text>
-          </View>
-        </View>
-      </View>
-
       {/* Project List */}
       <FlatList
         data={sortedProjects}
         keyExtractor={(item) => item.id}
         renderItem={renderProject}
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
+        ListHeaderComponent={
+          <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-2">
+            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
+              <View className="flex-1">
+                <Text className="text-gray-500 text-sm">Purchase</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.purchase)}</Text>
+              </View>
+              <View className="flex-1 items-center">
+                <Text className="text-gray-500 text-sm">Sales</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.sales)}</Text>
+              </View>
+              <View className="flex-1 items-end">
+                <Text className="text-gray-500 text-sm">Net</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.combined)}</Text>
+              </View>
+            </View>
+          </View>
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#ff4500']} tintColor="#ff4500" />
         }
