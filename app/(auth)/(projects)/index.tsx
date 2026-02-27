@@ -64,10 +64,9 @@ export default function ProjectsCombinedScreen() {
   const sortedProjects = useMemo<ProjectWithTotals[]>(() => {
     return projects
       .map((p) => {
-        // Expenses = sum of approved purchase bills
+        // Expenses = sum of all purchase bills
         const expenses = purchaseBills
           .filter((b) => b.project_id === p.id)
-          .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
           .reduce((sum, b) => sum + (Number(b.amount) - Number(b.discount)), 0);
 
         // Received = sum of sales payments
