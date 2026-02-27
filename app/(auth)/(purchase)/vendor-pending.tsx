@@ -180,7 +180,7 @@ export default function VendorPendingScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-blue-50">
         <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -190,7 +190,7 @@ export default function VendorPendingScreen() {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-blue-50">
       <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack />
 
       <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
@@ -255,8 +255,8 @@ export default function VendorPendingScreen() {
               </TouchableOpacity>
             </View>
 
-            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
-              <Text className="text-gray-500 text-sm">Total Pending Approval</Text>
+            <View className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
+              <Text className="text-blue-600/70 text-sm">Total Pending Approval</Text>
               <Text className="text-gray-800 text-lg font-bold">
                 {formatCurrency(totalPending)}
               </Text>

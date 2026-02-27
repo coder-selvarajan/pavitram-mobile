@@ -110,7 +110,7 @@ export default function SalesProjectListScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-green-50">
         <AppHeader title="Sales" />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -120,7 +120,7 @@ export default function SalesProjectListScreen() {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-green-50">
       <AppHeader title="Sales" />
 
       {/* Project List */}
@@ -131,8 +131,8 @@ export default function SalesProjectListScreen() {
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
         ListHeaderComponent={
           <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-2">
-            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
-              <Text className="text-gray-500 text-base">Total Outstanding</Text>
+            <View className="bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
+              <Text className="text-green-600/70 text-base">Total Outstanding</Text>
               <Text className="text-gray-800 text-xl font-bold tracking-tight">
                 {fmt(totalOutstanding)}
               </Text>

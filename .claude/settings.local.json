@@ -44,7 +44,8 @@
       "Bash(brew install fastlane)",
       "Bash(fastlane --version)",
       "Bash(brew install cocoapods)",
-      "Bash(pod --version)"
+      "Bash(pod --version)",
+      "Bash(ls:*)"
     ]
   }
 }

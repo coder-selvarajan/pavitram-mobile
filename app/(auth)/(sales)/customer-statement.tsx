@@ -271,7 +271,7 @@ export default function CustomerStatementScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-green-50">
         <AppHeader title={project?.project_name ?? 'Statement'} showBack />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -281,7 +281,7 @@ export default function CustomerStatementScreen() {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-green-50">
       <AppHeader
         title={project?.project_name ?? 'Statement'}
         showBack
@@ -364,21 +364,21 @@ export default function CustomerStatementScreen() {
             <Text className="text-gray-800 font-bold text-lg mb-2" numberOfLines={1}>
               {customer?.customer_name}
             </Text>
-            <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
+            <View className="bg-green-50 border border-green-200 rounded-lg px-4 py-2.5 flex-row">
               <View className="flex-1">
-                <Text className="text-gray-500 text-sm">Paid</Text>
+                <Text className="text-green-600/70 text-sm">Paid</Text>
                 <Text className="text-gray-800 text-lg font-bold">
                   {formatCurrency(summary.paid)}
                 </Text>
               </View>
               <View className="flex-1 items-center">
-                <Text className="text-gray-500 text-sm">Outstanding</Text>
+                <Text className="text-green-600/70 text-sm">Outstanding</Text>
                 <Text className="text-gray-800 text-lg font-bold">
                   {formatCurrency(summary.outstanding)}
                 </Text>
               </View>
               <View className="flex-1 items-end">
-                <Text className="text-gray-500 text-sm">Pending</Text>
+                <Text className="text-green-600/70 text-sm">Pending</Text>
                 <Text className="text-gray-800 text-lg font-bold">
                   {formatCurrency(summary.pendingApproval)}
                 </Text>
