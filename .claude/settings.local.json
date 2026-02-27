@@ -36,7 +36,15 @@
       "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/vendor-statement.tsx\")",
       "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/bill-edit.tsx\")",
       "Bash(wc -l \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/payment-edit.tsx\")",
-      "Bash(grep -n \"\\\\.single\\(\\)\" \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/\"*.tsx)"
+      "Bash(grep -n \"\\\\.single\\(\\)\" \"/Users/selvarajan/Documents/_ST/_Projects/_Shaan App/source-code/pavitram-mobile/app/\\(auth\\)/\"*.tsx)",
+      "Bash(find:*)",
+      "Bash(eas --version)",
+      "Bash(xcodebuild -version)",
+      "Bash(xcrun altool --version)",
+      "Bash(brew install fastlane)",
+      "Bash(fastlane --version)",
+      "Bash(brew install cocoapods)",
+      "Bash(pod --version)"
     ]
   }
 }

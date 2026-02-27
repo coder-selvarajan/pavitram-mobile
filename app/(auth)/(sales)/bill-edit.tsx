@@ -1,0 +1,574 @@
+import { useCallback, useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+  Platform,
+  KeyboardAvoidingView,
+} from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useAuth } from '../../../context/AuthContext';
+import { supabase } from '../../../lib/supabase';
+import AppHeader from '../../../components/AppHeader';
+import ModalPicker from '../../../components/ModalPicker';
+import { formatCurrency } from '../../../lib/helpers';
+import type { Project, Customer, SalesBill, SalesCategory } from '../../../types';
+
+const GST_OPTIONS = [0, 5, 18] as const;
+
+export default function SalesBillEditScreen() {
+  const { projectId, customerId, billId } = useLocalSearchParams<{
+    projectId: string;
+    customerId: string;
+    billId: string;
+  }>();
+  const { currentUser } = useAuth();
+
+  const isNew = billId === 'new';
+  const isAdmin = currentUser?.role === 'admin';
+
+  const [project, setProject] = useState<Project | null>(null);
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [categories, setCategories] = useState<SalesCategory[]>([]);
+  const [existingBill, setExistingBill] = useState<SalesBill | null>(null);
+
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [billNumber, setBillNumber] = useState('');
+  const [billAmount, setBillAmount] = useState('');
+  const [discount, setDiscount] = useState('');
+  const [category, setCategory] = useState('');
+  const [subCategory, setSubCategory] = useState('');
+  const [gst, setGst] = useState<number>(0);
+  const [description, setDescription] = useState('');
+  const [selectedCustomerId, setSelectedCustomerId] = useState(customerId ?? '');
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const amountNum = parseFloat(billAmount) || 0;
+  const discountNum = parseFloat(discount) || 0;
+  const netAmount = Math.max(0, amountNum - discountNum);
+
+  const isReadOnly = !isAdmin && !!existingBill && existingBill.status !== 'submitted';
+
+  const currentCategoryData = categories.find((c) => c.category === category);
+  const subcategories = currentCategoryData
+    ? currentCategoryData.subcategories.split(',').map((s) => s.trim()).filter(Boolean)
+    : [];
+
+  const fetchData = useCallback(async () => {
+    try {
+      const projectPromise = projectId
+        ? supabase.from('projects').select('*').eq('id', projectId).single()
+        : null;
+
+      const customerPromise = customerId
+        ? supabase.from('customers').select('*').eq('id', customerId).single()
+        : null;
+
+      const allCustomersPromise = supabase.from('customers').select('*').order('customer_name');
+
+      const categoriesPromise = supabase.from('sales_categories').select('*').order('category');
+
+      const billPromise = !isNew && billId
+        ? supabase.from('bills_sales').select('*').eq('id', billId).single()
+        : null;
+
+      const [projectRes, customerRes, allCustomersRes, categoriesRes, billRes] = await Promise.all([
+        projectPromise,
+        customerPromise,
+        allCustomersPromise,
+        categoriesPromise,
+        billPromise,
+      ]);
+
+      if (projectRes?.data) setProject(projectRes.data);
+      if (customerRes?.data) {
+        setCustomer(customerRes.data);
+        setSelectedCustomerId(customerRes.data.id);
+      }
+      if (allCustomersRes?.data) setCustomers(allCustomersRes.data);
+      if (categoriesRes?.data) setCategories(categoriesRes.data);
+
+      if (billRes?.data) {
+        const bill = billRes.data as SalesBill;
+        setExistingBill(bill);
+        setDate(new Date(bill.date));
+        setBillNumber(bill.bill_number ?? '');
+        setBillAmount(String(bill.amount));
+        setDiscount(String(bill.discount));
+        setCategory(bill.category ?? '');
+        setSubCategory(bill.subcategory ?? '');
+        setGst(bill.gst);
+        setDescription(bill.description ?? '');
+        setSelectedCustomerId(bill.customer_id);
+        const { data: c } = await supabase
+          .from('customers').select('*').eq('id', bill.customer_id).single();
+        if (c) setCustomer(c);
+      }
+    } catch (err) {
+      console.error('Error fetching sales bill data:', err);
+      Alert.alert('Error', 'Failed to load bill data');
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, customerId, billId, isNew]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (categories.length > 0 && !category && isNew) {
+      setCategory(categories[0].category);
+    }
+  }, [categories, category, isNew]);
+
+  const handleDateChange = (_event: unknown, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) setDate(selectedDate);
+  };
+
+  const formatDateDisplay = (d: Date) => {
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  };
+
+  const validate = (): string | null => {
+    if (!selectedCustomerId) return 'Please select a customer';
+    if (!billNumber.trim()) return 'Bill number is required';
+    if (amountNum <= 0) return 'Bill amount must be greater than 0';
+    if (!category) return 'Please select a category';
+    return null;
+  };
+
+  const handleSave = async (status: 'submitted' | 'approved' | 'payment_processed') => {
+    const error = validate();
+    if (error) {
+      Alert.alert('Validation Error', error);
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const billData = {
+        project_id: projectId,
+        customer_id: selectedCustomerId,
+        bill_number: billNumber.trim(),
+        date: date.toISOString().split('T')[0],
+        amount: amountNum,
+        discount: discountNum,
+        category,
+        subcategory: subCategory || null,
+        gst,
+        description: description.trim() || null,
+        status,
+        modified_by: currentUser?.id,
+        modified_date: new Date().toISOString(),
+      };
+
+      if (isNew) {
+        const { error: insertError } = await supabase
+          .from('bills_sales')
+          .insert({
+            ...billData,
+            created_by: currentUser?.id,
+            created_date: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+      } else {
+        const { error: updateError } = await supabase
+          .from('bills_sales')
+          .update(billData)
+          .eq('id', billId);
+
+        if (updateError) throw updateError;
+      }
+
+      setSaved(true);
+      setTimeout(() => router.back(), 800);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to save bill';
+      Alert.alert('Error', message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Bill?',
+      'This action cannot be undone. Are you sure you want to delete this bill?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            setSaving(true);
+            try {
+              const { error } = await supabase.from('bills_sales').delete().eq('id', billId);
+              if (error) throw error;
+              router.back();
+            } catch (err: unknown) {
+              const message = err instanceof Error ? err.message : 'Failed to delete bill';
+              Alert.alert('Error', message);
+            } finally {
+              setSaving(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const STATUS_CONFIG: Record<string, { label: string; bgColor: string; textColor: string }> = {
+    submitted: { label: 'Open', bgColor: '#fef3c7', textColor: '#d97706' },
+    approved: { label: 'Approved', bgColor: '#dbeafe', textColor: '#2563eb' },
+    payment_processed: { label: 'Pmt. Processed', bgColor: '#ede9fe', textColor: '#7c3aed' },
+  };
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-gray-50">
+        <AppHeader title={project?.project_name ?? 'Bill'} showBack />
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#ff4500" />
+        </View>
+      </View>
+    );
+  }
+
+  const headerRight = isAdmin && !isNew ? (
+    <TouchableOpacity
+      onPress={handleDelete}
+      className="p-1 rounded-full active:bg-primary-600"
+      accessibilityLabel="Delete bill"
+    >
+      <Ionicons name="trash-outline" size={22} color="#ffffff" />
+    </TouchableOpacity>
+  ) : undefined;
+
+  return (
+    <View className="flex-1 bg-gray-50">
+      <AppHeader
+        title={project?.project_name ?? (isNew ? 'Add Bill' : 'Edit Bill')}
+        showBack
+        rightContent={headerRight}
+      />
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        className="flex-1"
+      >
+        <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
+          <View className="bg-white px-4 py-3.5 flex-row items-center justify-between border-b border-gray-100 shadow-sm">
+            <Text className="text-gray-800 font-bold text-lg">
+              {isNew ? 'Add Bill' : 'Edit Bill'}
+            </Text>
+            <View className="flex-row items-center gap-2">
+              {existingBill && STATUS_CONFIG[existingBill.status] && (
+                <View
+                  style={{ backgroundColor: STATUS_CONFIG[existingBill.status].bgColor }}
+                  className="px-2 py-1 rounded-full"
+                >
+                  <Text
+                    style={{ color: STATUS_CONFIG[existingBill.status].textColor }}
+                    className="text-sm font-semibold"
+                  >
+                    {STATUS_CONFIG[existingBill.status].label}
+                  </Text>
+                </View>
+              )}
+              {isAdmin && !isNew && (
+                <TouchableOpacity
+                  onPress={handleDelete}
+                  className="p-1.5 rounded-lg active:bg-red-50"
+                >
+                  <Ionicons name="trash-outline" size={18} color="#f87171" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {saved && (
+            <View className="mx-3 mt-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2 flex-row items-center gap-2">
+              <Ionicons name="checkmark-circle" size={16} color="#22c55e" />
+              <Text className="text-green-700 text-base font-medium">Saved successfully</Text>
+            </View>
+          )}
+
+          <View className="px-3 py-2 pb-4">
+            <View className="bg-white rounded-xl shadow-sm border border-gray-100 px-3">
+
+              <FormRow label="Project">
+                <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                  <Text className="text-gray-600 text-base">{project?.project_name ?? '—'}</Text>
+                </View>
+              </FormRow>
+
+              <FormRow label="Customer">
+                {customerId ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{customer?.customer_name ?? '—'}</Text>
+                  </View>
+                ) : isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{customer?.customer_name ?? '—'}</Text>
+                  </View>
+                ) : (
+                  <ModalPicker
+                    selectedValue={selectedCustomerId}
+                    onValueChange={(val) => {
+                      const strVal = String(val);
+                      setSelectedCustomerId(strVal);
+                      const c = customers.find((cn) => cn.id === strVal);
+                      if (c) setCustomer(c);
+                    }}
+                    options={customers.map((c) => ({ label: c.customer_name, value: c.id }))}
+                    placeholder="— Select Customer —"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Date">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{formatDateDisplay(date)}</Text>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    onPress={() => setShowDatePicker(true)}
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 flex-row items-center justify-between bg-white"
+                  >
+                    <Text className="text-gray-800 text-base">{formatDateDisplay(date)}</Text>
+                    <Ionicons name="calendar-outline" size={16} color="#9ca3af" />
+                  </TouchableOpacity>
+                )}
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleDateChange}
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Bill #">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{billNumber || '—'}</Text>
+                  </View>
+                ) : (
+                  <TextInput
+                    value={billNumber}
+                    onChangeText={setBillNumber}
+                    placeholder="e.g. INV-2025-001"
+                    placeholderTextColor="#9ca3af"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Bill Amount">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{formatCurrency(amountNum)}</Text>
+                  </View>
+                ) : (
+                  <TextInput
+                    value={billAmount}
+                    onChangeText={setBillAmount}
+                    placeholder="0"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="numeric"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Discount">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{formatCurrency(discountNum)}</Text>
+                  </View>
+                ) : (
+                  <TextInput
+                    value={discount}
+                    onChangeText={setDiscount}
+                    placeholder="0"
+                    placeholderTextColor="#9ca3af"
+                    keyboardType="numeric"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Amount">
+                <View className="flex-row items-center gap-2 py-1">
+                  <Text className="text-primary-500 text-lg font-bold">
+                    {formatCurrency(netAmount)}
+                  </Text>
+                  {discountNum > 0 && (
+                    <Text className="text-gray-400 text-sm">
+                      ({formatCurrency(amountNum)} − {formatCurrency(discountNum)})
+                    </Text>
+                  )}
+                </View>
+              </FormRow>
+
+              <FormRow label="Category">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{category || '—'}</Text>
+                  </View>
+                ) : (
+                  <ModalPicker
+                    selectedValue={category}
+                    onValueChange={(val) => {
+                      setCategory(String(val));
+                      setSubCategory('');
+                    }}
+                    options={categories.map((c) => ({ label: c.category, value: c.category }))}
+                    placeholder="— Select Category —"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Sub Category">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{subCategory || '—'}</Text>
+                  </View>
+                ) : (
+                  <ModalPicker
+                    selectedValue={subCategory}
+                    onValueChange={(val) => setSubCategory(String(val))}
+                    options={subcategories.map((s) => ({ label: s, value: s }))}
+                    placeholder="— Select —"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="GST %">
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2">
+                    <Text className="text-gray-600 text-base">{gst}% GST</Text>
+                  </View>
+                ) : (
+                  <ModalPicker
+                    selectedValue={gst}
+                    onValueChange={(val) => setGst(Number(val))}
+                    options={GST_OPTIONS.map((g) => ({ label: `${g}% GST`, value: g }))}
+                    placeholder="— Select GST —"
+                  />
+                )}
+              </FormRow>
+
+              <FormRow label="Description" last>
+                {isReadOnly ? (
+                  <View className="bg-gray-50 border border-gray-100 rounded-lg px-2.5 py-2 min-h-[60px]">
+                    <Text className="text-gray-600 text-base">{description || '—'}</Text>
+                  </View>
+                ) : (
+                  <TextInput
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholder="Add notes or description..."
+                    placeholderTextColor="#9ca3af"
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                    className="border border-gray-200 rounded-lg px-2.5 py-2 text-gray-800 text-base bg-white min-h-[70px]"
+                  />
+                )}
+              </FormRow>
+            </View>
+          </View>
+
+          {!isReadOnly && (
+            <View className="px-3 pb-8">
+              <View className="flex-row gap-2 mb-2">
+                <TouchableOpacity
+                  onPress={() => router.back()}
+                  className="flex-1 py-3.5 rounded-lg bg-gray-200 items-center"
+                  activeOpacity={0.7}
+                >
+                  <Text className="text-gray-600 text-base font-semibold">Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => handleSave('submitted')}
+                  disabled={saving || saved}
+                  className="flex-1 py-3.5 rounded-lg bg-orange-500 items-center"
+                  activeOpacity={0.7}
+                  style={{ opacity: saving || saved ? 0.5 : 1 }}
+                >
+                  {saving ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <Text className="text-white text-base font-semibold">Submit</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              {isAdmin && (
+                <View className="flex-row gap-2">
+                  <TouchableOpacity
+                    onPress={() => handleSave('approved')}
+                    disabled={saving || saved}
+                    className="flex-1 py-3.5 rounded-lg bg-cyan-500 items-center"
+                    activeOpacity={0.7}
+                    style={{ opacity: saving || saved ? 0.5 : 1 }}
+                  >
+                    <Text className="text-white text-base font-semibold">Approve</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleSave('payment_processed')}
+                    disabled={saving || saved}
+                    className="flex-1 py-3.5 rounded-lg bg-sky-500 items-center"
+                    activeOpacity={0.7}
+                    style={{ opacity: saving || saved ? 0.5 : 1 }}
+                  >
+                    <Text className="text-white text-base font-semibold">Payment Processed</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
+  );
+}
+
+function FormRow({
+  label,
+  last,
+  children,
+}: {
+  label: string;
+  last?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <View className={`flex-row items-start gap-2 py-2.5 ${last ? '' : 'border-b border-gray-50'}`}>
+      <Text className="text-gray-500 text-base font-semibold w-24 pt-1.5">{label}</Text>
+      <View className="flex-1">{children}</View>
+    </View>
+  );
+}

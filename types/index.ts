@@ -76,3 +76,54 @@ export interface VendorSummary {
   outstanding: number;
   pendingApproval: number;
 }
+
+export interface Customer {
+  id: string;
+  customer_name: string;
+  created_at?: string;
+}
+
+export interface SalesBill {
+  id: string;
+  project_id: string;
+  customer_id: string;
+  bill_number: string | null;
+  date: string;
+  amount: number;
+  discount: number;
+  category: string | null;
+  subcategory: string | null;
+  gst: 0 | 5 | 18;
+  description: string | null;
+  status: 'submitted' | 'approved' | 'payment_processed';
+  created_by: string | null;
+  created_date: string | null;
+  modified_by: string | null;
+  modified_date: string | null;
+}
+
+export interface SalesPayment {
+  id: string;
+  project_id: string;
+  customer_id: string;
+  date: string;
+  amount: number;
+  payment_method_id: string;
+  description: string | null;
+  created_by: string | null;
+  created_date: string | null;
+  modified_by: string | null;
+  modified_date: string | null;
+}
+
+export interface SalesCategory {
+  id: string;
+  category: string;
+  subcategories: string;
+}
+
+export interface CustomerSummary {
+  paid: number;
+  outstanding: number;
+  pendingApproval: number;
+}

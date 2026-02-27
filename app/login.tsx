@@ -44,7 +44,7 @@ export default function LoginScreen() {
     if (loginError) {
       setError('Invalid username or password.');
     } else {
-      router.replace('/(auth)/projects');
+      router.replace('/(auth)/home');
     }
   };
 
