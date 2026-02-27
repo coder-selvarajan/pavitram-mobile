@@ -13,41 +13,35 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../lib/supabase';
 import AppHeader from '../../../components/AppHeader';
-import type { Project, Bill, Payment, SalesBill, SalesPayment } from '../../../types';
+import type { Project, Bill, SalesPayment } from '../../../types';
 
 const fmt = (n: number) =>
   '₹' + n.toLocaleString('en-IN');
 
-interface ProjectWithCombined extends Project {
-  purchaseOutstanding: number;
-  salesOutstanding: number;
-  combinedOutstanding: number;
+interface ProjectWithTotals extends Project {
+  expenses: number;
+  received: number;
+  balance: number;
 }
 
 export default function ProjectsCombinedScreen() {
   const { currentUser } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [purchaseBills, setPurchaseBills] = useState<Bill[]>([]);
-  const [purchasePayments, setPurchasePayments] = useState<Payment[]>([]);
-  const [salesBills, setSalesBills] = useState<SalesBill[]>([]);
   const [salesPayments, setSalesPayments] = useState<SalesPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [projectsRes, pBillsRes, pPaymentsRes, sBillsRes, sPaymentsRes] = await Promise.all([
+      const [projectsRes, pBillsRes, sPaymentsRes] = await Promise.all([
         supabase.from('projects').select('*').eq('status', 'active'),
         supabase.from('bills').select('*'),
-        supabase.from('payments').select('*'),
-        supabase.from('bills_sales').select('*'),
         supabase.from('payments_sales').select('*'),
       ]);
 
       if (projectsRes.data) setProjects(projectsRes.data);
       if (pBillsRes.data) setPurchaseBills(pBillsRes.data);
-      if (pPaymentsRes.data) setPurchasePayments(pPaymentsRes.data);
-      if (sBillsRes.data) setSalesBills(sBillsRes.data);
       if (sPaymentsRes.data) setSalesPayments(sPaymentsRes.data);
     } catch (err) {
       console.error('Error fetching combined project data:', err);
@@ -67,46 +61,37 @@ export default function ProjectsCombinedScreen() {
     fetchData();
   }, [fetchData]);
 
-  const sortedProjects = useMemo<ProjectWithCombined[]>(() => {
+  const sortedProjects = useMemo<ProjectWithTotals[]>(() => {
     return projects
       .map((p) => {
-        // Purchase outstanding
-        const pBills = purchaseBills.filter((b) => b.project_id === p.id);
-        const pApproved = pBills
+        // Expenses = sum of approved purchase bills
+        const expenses = purchaseBills
+          .filter((b) => b.project_id === p.id)
           .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
           .reduce((sum, b) => sum + (Number(b.amount) - Number(b.discount)), 0);
-        const pPaid = purchasePayments
-          .filter((pay) => pay.project_id === p.id)
-          .reduce((sum, pay) => sum + Number(pay.amount), 0);
-        const purchaseOutstanding = Math.max(0, pApproved - pPaid);
 
-        // Sales outstanding
-        const sBills = salesBills.filter((b) => b.project_id === p.id);
-        const sApproved = sBills
-          .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
-          .reduce((sum, b) => sum + (Number(b.amount) - Number(b.discount)), 0);
-        const sPaid = salesPayments
+        // Received = sum of sales payments
+        const received = salesPayments
           .filter((pay) => pay.project_id === p.id)
           .reduce((sum, pay) => sum + Number(pay.amount), 0);
-        const salesOutstanding = Math.max(0, sApproved - sPaid);
 
         return {
           ...p,
-          purchaseOutstanding,
-          salesOutstanding,
-          combinedOutstanding: purchaseOutstanding - salesOutstanding,
+          expenses,
+          received,
+          balance: received - expenses,
         };
       })
-      .sort((a, b) => b.combinedOutstanding - a.combinedOutstanding);
-  }, [projects, purchaseBills, purchasePayments, salesBills, salesPayments]);
+      .sort((a, b) => a.balance - b.balance);
+  }, [projects, purchaseBills, salesPayments]);
 
   const totals = useMemo(() => {
-    const purchase = sortedProjects.reduce((sum, p) => sum + p.purchaseOutstanding, 0);
-    const sales = sortedProjects.reduce((sum, p) => sum + p.salesOutstanding, 0);
-    return { purchase, sales, combined: purchase - sales };
+    const expenses = sortedProjects.reduce((sum, p) => sum + p.expenses, 0);
+    const received = sortedProjects.reduce((sum, p) => sum + p.received, 0);
+    return { expenses, received, balance: received - expenses };
   }, [sortedProjects]);
 
-  const renderProject = ({ item, index }: { item: ProjectWithCombined; index: number }) => (
+  const renderProject = ({ item, index }: { item: ProjectWithTotals; index: number }) => (
     <TouchableOpacity
       onPress={() => router.push(`/(auth)/(projects)/detail?projectId=${item.id}`)}
       className="bg-white rounded-xl shadow-sm border border-gray-100 mx-3 mb-2 px-4 py-3"
@@ -123,19 +108,19 @@ export default function ProjectsCombinedScreen() {
 
       <View className="flex-row">
         <View className="flex-1">
-          <Text className="text-gray-400 text-sm mb-0.5">Purchase</Text>
-          <Text className="text-primary-500 text-base font-semibold">{fmt(item.purchaseOutstanding)}</Text>
+          <Text className="text-gray-400 text-sm mb-0.5">Expenses</Text>
+          <Text className="text-primary-500 text-base font-semibold">{fmt(item.expenses)}</Text>
         </View>
         <View className="flex-1 items-center">
-          <Text className="text-gray-400 text-sm mb-0.5">Sales</Text>
-          <Text className="text-green-500 text-base font-semibold">{fmt(item.salesOutstanding)}</Text>
+          <Text className="text-gray-400 text-sm mb-0.5">Received</Text>
+          <Text className="text-green-500 text-base font-semibold">{fmt(item.received)}</Text>
         </View>
         <View className="flex-1 items-end">
-          <Text className="text-gray-400 text-sm mb-0.5">Net</Text>
+          <Text className="text-gray-400 text-sm mb-0.5">Balance</Text>
           <Text
-            className={`text-base font-bold ${item.combinedOutstanding > 0 ? 'text-primary-500' : 'text-green-500'}`}
+            className={`text-base font-bold ${item.balance < 0 ? 'text-primary-500' : 'text-green-500'}`}
           >
-            {fmt(item.combinedOutstanding)}
+            {fmt(item.balance)}
           </Text>
         </View>
       </View>
@@ -167,16 +152,16 @@ export default function ProjectsCombinedScreen() {
           <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-2">
             <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
               <View className="flex-1">
-                <Text className="text-gray-500 text-sm">Purchase</Text>
-                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.purchase)}</Text>
+                <Text className="text-gray-500 text-sm">Expenses</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.expenses)}</Text>
               </View>
               <View className="flex-1 items-center">
-                <Text className="text-gray-500 text-sm">Sales</Text>
-                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.sales)}</Text>
+                <Text className="text-gray-500 text-sm">Received</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.received)}</Text>
               </View>
               <View className="flex-1 items-end">
-                <Text className="text-gray-500 text-sm">Net</Text>
-                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.combined)}</Text>
+                <Text className="text-gray-500 text-sm">Balance</Text>
+                <Text className="text-gray-800 text-lg font-bold">{fmt(totals.balance)}</Text>
               </View>
             </View>
           </View>

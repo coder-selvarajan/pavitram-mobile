@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
-  SectionList,
+  FlatList,
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
@@ -14,12 +14,10 @@ import { useAuth } from '../../../context/AuthContext';
 import { supabase } from '../../../lib/supabase';
 import AppHeader from '../../../components/AppHeader';
 import { formatCurrency, formatDate } from '../../../lib/helpers';
-import type { Project, Bill, Payment, SalesBill, SalesPayment } from '../../../types';
+import type { Project, Bill, SalesPayment } from '../../../types';
 
-type CombinedItem =
+type ListItem =
   | { type: 'purchase_bill'; data: Bill }
-  | { type: 'purchase_payment'; data: Payment }
-  | { type: 'sales_bill'; data: SalesBill }
   | { type: 'sales_payment'; data: SalesPayment };
 
 export default function ProjectDetailScreen() {
@@ -28,8 +26,6 @@ export default function ProjectDetailScreen() {
 
   const [project, setProject] = useState<Project | null>(null);
   const [purchaseBills, setPurchaseBills] = useState<Bill[]>([]);
-  const [purchasePayments, setPurchasePayments] = useState<Payment[]>([]);
-  const [salesBills, setSalesBills] = useState<SalesBill[]>([]);
   const [salesPayments, setSalesPayments] = useState<SalesPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -37,18 +33,14 @@ export default function ProjectDetailScreen() {
   const fetchData = useCallback(async () => {
     if (!projectId) return;
     try {
-      const [projectRes, pBillsRes, pPaymentsRes, sBillsRes, sPaymentsRes] = await Promise.all([
+      const [projectRes, pBillsRes, sPaymentsRes] = await Promise.all([
         supabase.from('projects').select('*').eq('id', projectId).single(),
         supabase.from('bills').select('*').eq('project_id', projectId),
-        supabase.from('payments').select('*').eq('project_id', projectId),
-        supabase.from('bills_sales').select('*').eq('project_id', projectId),
         supabase.from('payments_sales').select('*').eq('project_id', projectId),
       ]);
 
       if (projectRes.data) setProject(projectRes.data);
       setPurchaseBills(pBillsRes.data ?? []);
-      setPurchasePayments(pPaymentsRes.data ?? []);
-      setSalesBills(sBillsRes.data ?? []);
       setSalesPayments(sPaymentsRes.data ?? []);
     } catch (err) {
       console.error('Error fetching project detail:', err);
@@ -69,47 +61,29 @@ export default function ProjectDetailScreen() {
   }, [fetchData]);
 
   const totals = useMemo(() => {
-    const pApproved = purchaseBills
-      .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
+    const expenses = purchaseBills
       .reduce((sum, b) => sum + (Number(b.amount) - Number(b.discount)), 0);
-    const pPaid = purchasePayments.reduce((sum, p) => sum + Number(p.amount), 0);
-    const purchaseOutstanding = Math.max(0, pApproved - pPaid);
+    const received = salesPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+    const balance = received - expenses;
 
-    const sApproved = salesBills
-      .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
-      .reduce((sum, b) => sum + (Number(b.amount) - Number(b.discount)), 0);
-    const sPaid = salesPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-    const salesOutstanding = Math.max(0, sApproved - sPaid);
+    return { expenses, received, balance };
+  }, [purchaseBills, salesPayments]);
 
-    return { purchaseOutstanding, salesOutstanding, net: purchaseOutstanding - salesOutstanding };
-  }, [purchaseBills, purchasePayments, salesBills, salesPayments]);
-
-  const sections = useMemo(() => {
-    const purchaseItems: CombinedItem[] = [
+  const listItems = useMemo(() => {
+    const items: ListItem[] = [
       ...purchaseBills
-        .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
         .map((b) => ({ type: 'purchase_bill' as const, data: b })),
-      ...purchasePayments.map((p) => ({ type: 'purchase_payment' as const, data: p })),
-    ].sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
-
-    const salesItems: CombinedItem[] = [
-      ...salesBills
-        .filter((b) => b.status === 'approved' || b.status === 'payment_processed')
-        .map((b) => ({ type: 'sales_bill' as const, data: b })),
       ...salesPayments.map((p) => ({ type: 'sales_payment' as const, data: p })),
     ].sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
-    return [
-      { title: 'Purchase', data: purchaseItems },
-      { title: 'Sales', data: salesItems },
-    ];
-  }, [purchaseBills, purchasePayments, salesBills, salesPayments]);
+    return items;
+  }, [purchaseBills, salesPayments]);
 
-  const renderItem = ({ item }: { item: CombinedItem }) => {
-    const isBill = item.type === 'purchase_bill' || item.type === 'sales_bill';
-    const isPayment = item.type === 'purchase_payment' || item.type === 'sales_payment';
+  const renderItem = ({ item }: { item: ListItem }) => {
+    const isBill = item.type === 'purchase_bill';
+    const isPayment = item.type === 'sales_payment';
     const amount = isBill
-      ? Number(item.data.amount) - Number((item.data as Bill | SalesBill).discount)
+      ? Number(item.data.amount) - Number((item.data as Bill).discount)
       : Number(item.data.amount);
 
     return (
@@ -117,27 +91,19 @@ export default function ProjectDetailScreen() {
         <View className={`w-1 h-6 rounded-full ${isBill ? 'bg-blue-400' : 'bg-green-400'}`} />
         <View className="flex-1 min-w-0">
           <Text className={`text-sm font-bold uppercase tracking-wide ${isBill ? 'text-blue-500' : 'text-green-600'}`}>
-            {isBill ? 'Bill' : 'Payment'}
+            {isBill ? 'Expense' : 'Received'}
           </Text>
           <Text className="text-gray-400 text-base" numberOfLines={1}>
             {formatDate(item.data.date)}
-            {isBill && (item.data as Bill | SalesBill).bill_number ? ` · #${(item.data as Bill | SalesBill).bill_number}` : ''}
+            {isBill && (item.data as Bill).bill_number ? ` · #${(item.data as Bill).bill_number}` : ''}
           </Text>
         </View>
         <Text className={`text-base font-bold ${isPayment ? 'text-green-600' : 'text-gray-900'}`}>
-          {isPayment ? '-' : ''}{formatCurrency(amount)}
+          {isPayment ? '+' : '-'}{formatCurrency(amount)}
         </Text>
       </View>
     );
   };
-
-  const renderSectionHeader = ({ section }: { section: { title: string; data: CombinedItem[] } }) => (
-    <View className="bg-gray-50 px-4 py-2 border-b border-gray-100">
-      <Text className="text-gray-600 font-bold text-base">
-        {section.title} ({section.data.length})
-      </Text>
-    </View>
-  );
 
   if (loading) {
     return (
@@ -154,27 +120,26 @@ export default function ProjectDetailScreen() {
     <View className="flex-1 bg-gray-50">
       <AppHeader title={project?.project_name ?? 'Project Detail'} showBack />
 
-      {/* Combined transaction list */}
-      <SectionList
-        sections={sections}
+      {/* Transaction list */}
+      <FlatList
+        data={listItems}
         keyExtractor={(item, index) => `${item.type}-${item.data.id}-${index}`}
         renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 16 }}
         ListHeaderComponent={
           <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-1">
             <View className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5 flex-row">
               <View className="flex-1">
-                <Text className="text-gray-500 text-sm">Purchase</Text>
-                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.purchaseOutstanding)}</Text>
+                <Text className="text-gray-500 text-sm">Expenses</Text>
+                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.expenses)}</Text>
               </View>
               <View className="flex-1 items-center">
-                <Text className="text-gray-500 text-sm">Sales</Text>
-                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.salesOutstanding)}</Text>
+                <Text className="text-gray-500 text-sm">Received</Text>
+                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.received)}</Text>
               </View>
               <View className="flex-1 items-end">
-                <Text className="text-gray-500 text-sm">Net</Text>
-                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.net)}</Text>
+                <Text className="text-gray-500 text-sm">Balance</Text>
+                <Text className="text-gray-800 text-lg font-bold">{formatCurrency(totals.balance)}</Text>
               </View>
             </View>
           </View>
