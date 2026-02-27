@@ -214,7 +214,7 @@ export default function PaymentEditScreen() {
 
   if (!isAdmin) {
     return (
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-blue-100">
         <AppHeader title="Access Denied" showBack />
         <View className="flex-1 items-center justify-center px-8">
           <Ionicons name="lock-closed-outline" size={48} color="#d1d5db" />
@@ -229,7 +229,7 @@ export default function PaymentEditScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-blue-100">
         <AppHeader title={project?.project_name ?? 'Payment'} showBack />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -239,7 +239,7 @@ export default function PaymentEditScreen() {
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-blue-100">
       <AppHeader
         title={project?.project_name ?? (isNew ? 'Add Payment' : 'Edit Payment')}
         showBack

@@ -181,7 +181,7 @@ export default function VendorListScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-blue-50">
+      <View className="flex-1 bg-blue-100">
         <AppHeader title={project?.project_name ?? 'Vendors'} showBack />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -191,7 +191,7 @@ export default function VendorListScreen() {
   }
 
   return (
-    <View className="flex-1 bg-blue-50">
+    <View className="flex-1 bg-blue-100">
       <AppHeader title={project?.project_name ?? 'Vendors'} showBack />
 
       {/* Vendor List */}
@@ -202,7 +202,7 @@ export default function VendorListScreen() {
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
         ListHeaderComponent={
           <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-2">
-            <View className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex-row">
+            <View className="bg-blue-100 border border-blue-200 rounded-lg px-4 py-2.5 flex-row">
               <View className="flex-1">
                 <Text className="text-blue-600/70 text-sm">Paid</Text>
                 <Text className="text-gray-800 text-lg font-bold">{fmt(totals.paid)}</Text>

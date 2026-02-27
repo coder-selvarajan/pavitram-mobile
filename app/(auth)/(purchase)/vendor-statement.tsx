@@ -141,12 +141,6 @@ export default function VendorStatementScreen() {
             <Ionicons name="add" size={16} color="#ffffff" />
             <Text className="text-white text-base font-medium">Payment</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            className="p-2 rounded-full bg-gray-100"
-            activeOpacity={0.7}
-          >
-            <Ionicons name="download-outline" size={20} color="#6b7280" />
-          </TouchableOpacity>
         </View>
       ) : null,
     [isAdmin, projectId, vendorId],
@@ -192,7 +186,7 @@ export default function VendorStatementScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-blue-50">
+      <View className="flex-1 bg-blue-100">
         <AppHeader title={project?.project_name ?? 'Statement'} showBack />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -202,7 +196,7 @@ export default function VendorStatementScreen() {
   }
 
   return (
-    <View className="flex-1 bg-blue-50">
+    <View className="flex-1 bg-blue-100">
       <AppHeader
         title={project?.project_name ?? 'Statement'}
         showBack
@@ -285,7 +279,7 @@ export default function VendorStatementScreen() {
             <Text className="text-gray-800 font-bold text-lg mb-2" numberOfLines={1}>
               {vendor?.vendor_name}
             </Text>
-            <View className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex-row">
+            <View className="bg-blue-100 border border-blue-200 rounded-lg px-4 py-2.5 flex-row">
               <View className="flex-1">
                 <Text className="text-blue-600/70 text-sm">Paid</Text>
                 <Text className="text-gray-800 text-lg font-bold">

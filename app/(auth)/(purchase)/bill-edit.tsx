@@ -244,7 +244,7 @@ export default function BillEditScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-gray-50">
+      <View className="flex-1 bg-blue-100">
         <AppHeader title={project?.project_name ?? 'Bill'} showBack />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -264,7 +264,7 @@ export default function BillEditScreen() {
   ) : undefined;
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-blue-100">
       <AppHeader
         title={project?.project_name ?? (isNew ? 'Add Bill' : 'Edit Bill')}
         showBack

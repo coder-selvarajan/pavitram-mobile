@@ -77,7 +77,7 @@ export default function HomeScreen() {
             <Ionicons name="menu-outline" size={26} color="#ff4500" />
           </TouchableOpacity>
 
-          <Text className="flex-1 text-xl font-semibold text-primary-500 tracking-wide">
+          <Text className="flex-1 text-2xl font-semibold text-primary-500 tracking-wide">
             Dashboard
           </Text>
         </View>

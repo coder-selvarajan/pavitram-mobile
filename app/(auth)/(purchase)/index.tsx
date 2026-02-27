@@ -110,7 +110,7 @@ export default function PurchaseProjectListScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-blue-50">
+      <View className="flex-1 bg-blue-100">
         <AppHeader title="Purchase" />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
@@ -120,7 +120,7 @@ export default function PurchaseProjectListScreen() {
   }
 
   return (
-    <View className="flex-1 bg-blue-50">
+    <View className="flex-1 bg-blue-100">
       <AppHeader title="Purchase" />
 
       {/* Project List */}
@@ -131,7 +131,7 @@ export default function PurchaseProjectListScreen() {
         contentContainerStyle={{ paddingTop: 8, paddingBottom: 16 }}
         ListHeaderComponent={
           <View className="bg-white border-b border-gray-200 px-4 pb-3 pt-3 mb-2">
-            <View className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
+            <View className="bg-blue-100 border border-blue-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
               <Text className="text-blue-600/70 text-base">Total Outstanding</Text>
               <Text className="text-gray-800 text-xl font-bold tracking-tight">
                 {fmt(totalOutstanding)}

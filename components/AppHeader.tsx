@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '../context/AuthContext';
 
 interface AppHeaderProps {
   title: string;
@@ -13,16 +12,10 @@ interface AppHeaderProps {
 
 export default function AppHeader({ title, showBack = false, onBack, rightContent }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
-  const { logout } = useAuth();
 
   const handleBack = () => {
     if (onBack) onBack();
     else router.back();
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    router.replace('/login');
   };
 
   return (
@@ -42,20 +35,12 @@ export default function AppHeader({ title, showBack = false, onBack, rightConten
           </TouchableOpacity>
         )}
 
-        <Text className="flex-1 text-xl font-semibold text-primary-500 tracking-wide" numberOfLines={1}>
+        <Text className="flex-1 text-2xl font-semibold text-primary-500 tracking-wide" numberOfLines={1}>
           {title}
         </Text>
 
-        {/* Right: optional content + Settings + Logout */}
+        {/* Right: optional content */}
         {rightContent}
-
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="p-1.5 rounded-full active:bg-gray-100"
-          accessibilityLabel="Sign out"
-        >
-          <Ionicons name="log-out-outline" size={26} color="#6b7280" />
-        </TouchableOpacity>
       </View>
     </View>
   );

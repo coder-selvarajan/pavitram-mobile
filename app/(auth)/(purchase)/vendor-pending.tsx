@@ -165,6 +165,24 @@ export default function VendorPendingScreen() {
     [bills],
   );
 
+  const headerRight = useMemo(
+    () => (
+      <TouchableOpacity
+        onPress={() =>
+          router.push(
+            `/(auth)/(purchase)/bill-edit?projectId=${projectId}&vendorId=${vendorId}&billId=new`,
+          )
+        }
+        className="flex-row items-center gap-1.5 bg-primary-500 px-3.5 py-2 rounded-full"
+        activeOpacity={0.7}
+      >
+        <Ionicons name="add" size={16} color="#ffffff" />
+        <Text className="text-white text-base font-medium">Bill</Text>
+      </TouchableOpacity>
+    ),
+    [projectId, vendorId],
+  );
+
   const handleBillPress = (bill: Bill) => {
     router.push(
       `/(auth)/(purchase)/bill-edit?projectId=${projectId}&vendorId=${vendorId}&billId=${bill.id}`,
@@ -180,8 +198,8 @@ export default function VendorPendingScreen() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-blue-50">
-        <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack />
+      <View className="flex-1 bg-blue-100">
+        <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack rightContent={headerRight} />
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color="#ff4500" />
         </View>
@@ -190,8 +208,8 @@ export default function VendorPendingScreen() {
   }
 
   return (
-    <View className="flex-1 bg-blue-50">
-      <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack />
+    <View className="flex-1 bg-blue-100">
+      <AppHeader title={project?.project_name ?? 'Pending Approval'} showBack rightContent={headerRight} />
 
       <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
         <TouchableOpacity
@@ -234,28 +252,14 @@ export default function VendorPendingScreen() {
         }}
         ListHeaderComponent={
           <View className="bg-white border-b border-gray-200 -mx-3 px-4 pb-3.5 pt-3 mb-2">
-            <View className="flex-row items-center justify-between mb-2">
-              <View className="flex-1 min-w-0 pr-2">
-                <Text className="text-gray-800 font-bold text-lg" numberOfLines={1}>
-                  {vendor?.vendor_name}
-                </Text>
-                <Text className="text-gray-500 text-sm mt-0.5">Pending Approval</Text>
-              </View>
-              <TouchableOpacity
-                onPress={() =>
-                  router.push(
-                    `/(auth)/(purchase)/bill-edit?projectId=${projectId}&vendorId=${vendorId}&billId=new`,
-                  )
-                }
-                className="flex-row items-center gap-1.5 bg-primary-500 px-3.5 py-2 rounded-full flex-shrink-0"
-                activeOpacity={0.7}
-              >
-                <Ionicons name="add" size={16} color="#ffffff" />
-                <Text className="text-white text-base font-medium">Add Bill</Text>
-              </TouchableOpacity>
+            <View className="mb-2">
+              <Text className="text-gray-800 font-bold text-lg" numberOfLines={1}>
+                {vendor?.vendor_name}
+              </Text>
+              <Text className="text-gray-500 text-sm mt-0.5">Pending Approval</Text>
             </View>
 
-            <View className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
+            <View className="bg-blue-100 border border-blue-200 rounded-lg px-4 py-2.5 flex-row items-center justify-between">
               <Text className="text-blue-600/70 text-sm">Total Pending Approval</Text>
               <Text className="text-gray-800 text-lg font-bold">
                 {formatCurrency(totalPending)}
